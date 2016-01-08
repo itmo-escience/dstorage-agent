@@ -17,7 +17,7 @@ public class HttpHeaders {
             headers.put(allHeaders[i].getName(), allHeaders[i].getValue());
         }
             //   for (Map.Entry<String, String> entry: this.headers.entrySet())
-            Agent.log.info("Headers ticket:"+headers.get("Ticket"));
+            Main.log.info("Headers ticket:"+headers.get("Ticket"));
             this.headers=headers;
         /*
         if (request.containsHeader("Ticket") && request.containsHeader("Sign") ){

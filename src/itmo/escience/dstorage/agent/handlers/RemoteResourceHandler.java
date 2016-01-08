@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.handlers;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.AgentSystem;
 import itmo.escience.dstorage.agent.Commands;
 import itmo.escience.dstorage.agent.requests.AgentRequest;
@@ -26,12 +26,12 @@ public class RemoteResourceHandler implements IRequestHandler{
         /*
         RemoteResourceRequest remoteRequest =(RemoteResourceRequest)request;
         if ((request instanceof HttpEntityEnclosingRequest) && 
-                URLDecoder.decode(request.getRequestLine().getUri(),Agent.getLocalEncoding()).equals("/remoteresource")) {
+                URLDecoder.decode(request.getRequestLine().getUri(),Main.getLocalEncoding()).equals("/remoteresource")) {
                         HttpEntity enRequest = ((HttpEntityEnclosingRequest)request).getEntity();
                         String entityContent = EntityUtils.toString(enRequest);
-                        Agent.log.info("Incoming PUT Request:\n" + entityContent);
+                        Main.log.info("Incoming PUT Request:\n" + entityContent);
                         JSONObject jsonPutRequest = AgentSystem.parseJSON(entityContent);
-                        Agent.log.info("JSON incoming PUT Request on /remoteresource = " + jsonPutRequest);
+                        Main.log.info("JSON incoming PUT Request on /remoteresource = " + jsonPutRequest);
                         JSONObject jsonStatus=new JSONObject();
                         //TO DO if not action generation error
                         if (jsonPutRequest.containsKey("action")){
@@ -42,7 +42,7 @@ public class RemoteResourceHandler implements IRequestHandler{
                             jsonStatus.put("status", AgentSystem.STATUS_ERROR);
                             response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
                         }    
-                        Agent.log.info(jsonStatus.toString()); 
+                        Main.log.info(jsonStatus.toString()); 
                         StringEntity strEntRequest = new StringEntity (jsonStatus.toString(),System.getProperty("file.encoding"));
                         strEntRequest.setContentType("application/json");     
                         response.setEntity(strEntRequest);

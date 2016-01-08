@@ -30,10 +30,10 @@ public class JRequest extends ARequest {
              obj = jsonParser.parse(json);
          } 
          catch (ParseException ex) {
-            Agent.log.error("JSON Parse Error. Object:"+ex.getUnexpectedObject()+"; Position:"+ex.getPosition());
+            Main.log.error("JSON Parse Error. Object:"+ex.getUnexpectedObject()+"; Position:"+ex.getPosition());
          }
          catch (Exception ex) {                  
-            Agent.log.error("JSON Exception:"+ex.getMessage());
+            Main.log.error("JSON Exception:"+ex.getMessage());
          }          
          this.rawJson=(JSONObject)obj;
          //TODO need exception control

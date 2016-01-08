@@ -61,13 +61,13 @@ public class ProcessFile implements Runnable{
         this.request=request;
         //check that jar file parsed for serialize return value from ProcessFile
         
-        if (!(new File(Agent.getAgentDocRoot()+File.separator+request.name+"-MRSerializatorPF.jar")).exists()){
-            if(!JarVerifier.verify(executer, DefinitionAvgResult.ProcessFile)) {Agent.log.error(ProcessFile.class.getName()+" Error while verify jar file.");return;}
+        if (!(new File(Main.getAgentDocRoot()+File.separator+request.name+"-MRSerializatorPF.jar")).exists()){
+            if(!JarVerifier.verify(executer, DefinitionAvgResult.ProcessFile)) {Main.log.error(ProcessFile.class.getName()+" Error while verify jar file.");return;}
             //MRHandlerParser parser=new MRHandlerParser(request.name,"bigdata.AvgResult","ProcessFile","MRSerializatorPF");
             MRHandlerParser parser=new MRHandlerParser(request.name,method,"MRSerializatorPF");
-            if(!parser.parseJar()) {Agent.log.error(ProcessFile.class.getName()+" Error while parse jar file.");return;}
-            parser.writeProto(Agent.getAgentDocRoot()+File.separator+request.name+"-pf.proto");           
-            parser.invokeProtoc(Agent.getAgentDocRoot()+File.separator+request.name+"-pf.proto");
+            if(!parser.parseJar()) {Main.log.error(ProcessFile.class.getName()+" Error while parse jar file.");return;}
+            parser.writeProto(Main.getAgentDocRoot()+File.separator+request.name+"-pf.proto");           
+            parser.invokeProtoc(Main.getAgentDocRoot()+File.separator+request.name+"-pf.proto");
             parser.generateSrc();
             parser.generateSerializator();
         }
@@ -75,8 +75,8 @@ public class ProcessFile implements Runnable{
     @Override
     public void run(){
         //check that jar file exist 
-        if (!(new File (Agent.getAgentDocRoot().getPath()+File.separator+this.request.name)).exists()) {            
-                Agent.log.error(ProcessFile.class.getName()+". Jar file "+ this.request.name+" doesn't exist");
+        if (!(new File (Main.getAgentDocRoot().getPath()+File.separator+this.request.name)).exists()) {            
+                Main.log.error(ProcessFile.class.getName()+". Jar file "+ this.request.name+" doesn't exist");
             try {
                 returnResult(null);
             } catch (Exception ex) {
@@ -92,14 +92,14 @@ public class ProcessFile implements Runnable{
             //
             long runTime=new Date().getTime();
             
-            if ((new File (Agent.getAgentDocRoot().getPath()+File.separator+entry.getKey().toString())).exists())            
+            if ((new File (Main.getAgentDocRoot().getPath()+File.separator+entry.getKey().toString())).exists())            
                 try {
                 process(entry.getKey().toString(),entry.getValue().toString());
             } catch (Exception ex) {
                 Logger.getLogger(ProcessFile.class.getName()).log(Level.SEVERE, null, ex);
             }
             else {
-                Agent.log.error(ProcessFile.class.getName()+" . File "+ entry.getKey().toString()+"doesn't exist");
+                Main.log.error(ProcessFile.class.getName()+" . File "+ entry.getKey().toString()+"doesn't exist");
                 try {
                     returnResult(null);
                 } catch (Exception ex) {
@@ -107,7 +107,7 @@ public class ProcessFile implements Runnable{
                 }
                 continue;   
                 }                           
-            Agent.getMapReduceStat().addStat(new MapStat(new Date(),Agent.getAgentAddress(),Long.toString(session),entry.getKey().toString(),((new Date().getTime())-runTime)));
+            Main.getMapReduceStat().addStat(new MapStat(new Date(),Main.getAgentAddress(),Long.toString(session),entry.getKey().toString(),((new Date().getTime())-runTime)));
                    
            /*
             try {
@@ -115,7 +115,7 @@ public class ProcessFile implements Runnable{
                 Perf.IOQueue();
                 Perf.IOSpeed(); 
             } catch (IOException ex) {
-                Agent.log.error(ProcessFile.class.getName()+" . Error while execute perf task");
+                Main.log.error(ProcessFile.class.getName()+" . Error while execute perf task");
             }
             */
         }
@@ -124,20 +124,20 @@ public class ProcessFile implements Runnable{
         Object res=null;
         URL url,url2,url3; 
         try {
-            url = new URL("file:"+Agent.getAgentDocRoot().getPath()+File.separator+this.request.name);
-            url3 = new URL("file:"+Agent.getAgentDocRoot()+File.separator+this.executer+"-MRSerializatorPF.jar");
+            url = new URL("file:"+Main.getAgentDocRoot().getPath()+File.separator+this.request.name);
+            url3 = new URL("file:"+Main.getAgentDocRoot()+File.separator+this.executer+"-MRSerializatorPF.jar");
             urlClassLoader = new URLClassLoader (new URL[] {url,url3});
             Class<?> cl = Class.forName ("bigdata.AvgResult", true, urlClassLoader);
             Method join = cl.getMethod("ProcessFile", new Class[]{InputStream.class,String.class,String.class});
-            res=(join.invoke(cl.newInstance(),new FileInputStream(new File(Agent.getAgentDocRoot().getPath()+File.separator+file)),storagefilename, request.options ));
+            res=(join.invoke(cl.newInstance(),new FileInputStream(new File(Main.getAgentDocRoot().getPath()+File.separator+file)),storagefilename, request.options ));
             //Agent.log.info("res="+res.getClass().getName());                                
         } catch (MalformedURLException ex) {
-            Agent.log.error(ProcessFile.class.getName()+" . MalformedURLException "+ex);
+            Main.log.error(ProcessFile.class.getName()+" . MalformedURLException "+ex);
         } catch (ClassNotFoundException ex) {
-            Agent.log.error(ProcessFile.class.getName()+" . ClassNotFoundException "+ex);
+            Main.log.error(ProcessFile.class.getName()+" . ClassNotFoundException "+ex);
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
-            Agent.log.error(ProcessFile.class.getName()+" . NoSuchMethodException "+ex);
+            Main.log.error(ProcessFile.class.getName()+" . NoSuchMethodException "+ex);
         } catch (InstantiationException ex) {
             Logger.getLogger(ProcessFile.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
@@ -145,14 +145,14 @@ public class ProcessFile implements Runnable{
         } catch (InvocationTargetException ex) {
             Logger.getLogger(ProcessFile.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
-            Agent.log.error("File "+file+" not found");           
+            Main.log.error("File "+file+" not found");           
             Logger.getLogger(ProcessFile.class.getName()).log(Level.SEVERE, null, ex);
         }
         returnResult(res);
     }
     private void returnResult(Object res) throws Exception{        
         
-        Agent.log.error("Object in returnResult "+res.toString());
+        Main.log.error("Object in returnResult "+res.toString());
         //create MapReduceMsg         
         MapReduceMsg.Builder mbuilder=MapReduceMsg.newBuilder();
         mbuilder.setAction(MapReduceMsg.Action.REDUCE);
@@ -169,10 +169,10 @@ public class ProcessFile implements Runnable{
         //mbuilder.setData(ByteString.copyFrom(objectToByte(res)));
         mbuilder.setData(ByteString.copyFrom(serializeResult(res)));
         
-        Agent.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t4);
+        Main.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t4);
         try{
             HttpConn httpconn = new HttpConn();
-            httpconn.setup(Agent.getAgentAddress(),Agent.getAgentPort()); 
+            httpconn.setup(Main.getAgentAddress(),Main.getAgentPort()); 
             httpconn.setMethod("PUT","/reduce");
             //httpconn.setEntity(mapRes);
             //mbuilder.build().toByteArray()
@@ -194,10 +194,10 @@ public class ProcessFile implements Runnable{
             Method getSerial = cl.getMethod("getSerialized", new Class<?>[] {Object.class});
             bytes=(byte[])getSerial.invoke(cl.newInstance(),ob);
         } catch (ClassNotFoundException ex) {
-            Agent.log.error(ProcessFile.class.getName()+" . ClassNotFoundException "+ex);            
+            Main.log.error(ProcessFile.class.getName()+" . ClassNotFoundException "+ex);            
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
-            Agent.log.error(ProcessFile.class.getName()+" . NoSuchMethodException "+ex);
+            Main.log.error(ProcessFile.class.getName()+" . NoSuchMethodException "+ex);
         } catch (InstantiationException ex) {
             Logger.getLogger(ProcessFile.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {

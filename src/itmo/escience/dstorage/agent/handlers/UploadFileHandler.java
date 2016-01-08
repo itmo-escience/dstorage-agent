@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.handlers;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.AgentSystem;
 import itmo.escience.dstorage.agent.Network;
 import itmo.escience.dstorage.agent.StorageLayer;
@@ -45,7 +45,7 @@ public class UploadFileHandler implements IRequestHandler{
     public AgentResponse handle(AgentRequest request) {
         this.request=(UploadFileRequest)request;
         if(!validateRequest())return response;        
-        StorageLayer layer=Agent.getStorageLayer();
+        StorageLayer layer=Main.getStorageLayer();
         String filename = this.request.getTarget();        
         if (layer.isFileExist(filename)) {
             response.setStatus(HttpStatus.SC_FORBIDDEN);
@@ -55,14 +55,14 @@ public class UploadFileHandler implements IRequestHandler{
         } 
         //check that options of ssd and mem indicated in config if else return error response
         if(!this.request.getStorageType().equals(StorageLevel.HDD)){
-            if(this.request.getStorageType().equals(StorageLevel.SSD) && (Agent.getSsdQuota()==null || Agent.agentSsdDocRoot==null)){
+            if(this.request.getStorageType().equals(StorageLevel.SSD) && (Main.getSsdQuota()==null || Main.agentSsdDocRoot==null)){
                 response.setStatus(HttpStatus.SC_CONFLICT);
                 response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Needed for processing the request options (SSDQuota or AgentSSDdocRoot) "
                         + "not set in config", 
                     AgentSystemStatus.FAILED));     
                 return response;
             }
-            if(this.request.getStorageType().equals(StorageLevel.MEM) && Agent.getMemQuota()==null){
+            if(this.request.getStorageType().equals(StorageLevel.MEM) && Main.getMemQuota()==null){
                 response.setStatus(HttpStatus.SC_CONFLICT);
                 response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Needed for processing the request options (RAMQuota) not set in config", 
                     AgentSystemStatus.FAILED));     
@@ -82,7 +82,7 @@ public class UploadFileHandler implements IRequestHandler{
         OutputStream outFile;
         try {
             inputstreamEnRequest = enRequest.getContent();
-            outFile = new FileOutputStream(Agent.getAgentDocRoot().getPath() +File.separatorChar+ file.getName());             
+            outFile = new FileOutputStream(Main.getAgentDocRoot().getPath() +File.separatorChar+ file.getName());             
         int intBytesRead=0;
         byte[] bytes = new byte[4096];
         while ((intBytesRead=inputstreamEnRequest.read(bytes))!=-1)
@@ -99,12 +99,12 @@ public class UploadFileHandler implements IRequestHandler{
             //if(request.checkHeaders(new String[]{AgentHttpHeaders.StorageLevel.getHeaderString()})) 
             //jsonRequest.put("lvl", ((UploadFileRequest)request).getStorageType().getNum());
             //jsonRequest.put("lvlto", layer.getFileStorageType(filename).getNum());
-            jsonRequest.put("ip", Agent.getAgentAddress());
-            jsonRequest.put("port", Agent.getConfig().getProperty("AgentPort"));                  
+            jsonRequest.put("ip", Main.getAgentAddress());
+            jsonRequest.put("port", Main.getConfig().getProperty("AgentPort"));                  
             try {    
                 Network.returnDownloadFileStatus(jsonRequest);
             } catch (Exception ex) {
-                Agent.log.error("Exception in handle "+ex.getMessage());
+                Main.log.error("Exception in handle "+ex.getMessage());
             }                                        
         return this.response;
     }

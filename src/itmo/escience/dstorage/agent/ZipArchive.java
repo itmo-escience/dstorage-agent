@@ -24,8 +24,8 @@ public class ZipArchive implements Runnable {
     public void run() {   
         JSONObject jsonStatus=new JSONObject();
         jsonStatus.put("action", "ack");
-        jsonStatus.put("agent_ipaddress", Agent.getAgentAddress());
-        jsonStatus.put("agent_port", Agent.getConfig().getProperty("AgentPort"));
+        jsonStatus.put("agent_ipaddress", Main.getAgentAddress());
+        jsonStatus.put("agent_port", Main.getConfig().getProperty("AgentPort"));
         try {
             ZipOutputStream zipOutStream =
             new ZipOutputStream(new FileOutputStream(zipfile));
@@ -62,18 +62,18 @@ public class ZipArchive implements Runnable {
         jsonStatus.put("file_id",(new File(zipfile)).getName());
         jsonStatus.put("file_size",Long.toString((new File(zipfile)).length()));
         } catch (FileNotFoundException fx) {
-            Agent.log.error("FileNotFoundException :"+fx.getLocalizedMessage());
+            Main.log.error("FileNotFoundException :"+fx.getLocalizedMessage());
             jsonStatus.put("msg", "ZipArchive. File not found");
             jsonStatus.put("status", AgentSystem.STATUS_ERROR);
         } catch (IOException ioex) {                  
-            Agent.log.error("IOexception:"+ioex.getMessage());
+            Main.log.error("IOexception:"+ioex.getMessage());
             jsonStatus.put("msg", "Input-Output Error");
             jsonStatus.put("status", AgentSystem.STATUS_ERROR);
         } 
         try{
             Network.returnDownloadFileStatus(jsonStatus);
         }catch (Exception ex){
-            Agent.log.error("Exception :"+ex.getLocalizedMessage());
+            Main.log.error("Exception :"+ex.getLocalizedMessage());
         }
     }
     public ZipArchive(JSONObject list, String zipfile, String rootDir) {

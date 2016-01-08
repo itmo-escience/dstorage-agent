@@ -92,7 +92,7 @@ public class MapReduceStat {
             
             /*
             if (!ms.isWrited){
-                writeStat("MapLog_"+Agent.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
+                writeStat("MapLog_"+Main.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
                 "map "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(ms.date))+" "+ms.agentAddress+" "+ms.session+" "+ms.fileName+" "+
                     Long.toString(ms.time));
                 ms.isWrited=true;
@@ -109,15 +109,15 @@ public class MapReduceStat {
     }
     public void writeStatToFiles(){
         //mapstats
-        //System.out.println("map.size="+Agent.getMapReduceStat().mapstat.size());
-        //System.out.println("maptotal.size="+Agent.getMapReduceStat().maptotalstat.size());
+        //System.out.println("map.size="+Main.getMapReduceStat().mapstat.size());
+        //System.out.println("maptotal.size="+Main.getMapReduceStat().maptotalstat.size());
         
         //mapStat
         Iterator<MapStat> itermap= this.mapstat.iterator();
         while(itermap.hasNext()){
             MapStat ms=itermap.next();
             if (!ms.isWrited){
-                writeStat("MapLog_"+Agent.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
+                writeStat("MapLog_"+Main.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
                 "map "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(ms.date))+" "+ms.agentAddress+" "+ms.session+" "+ms.fileName+" "+
                     Long.toString(ms.time));
                 ms.isWrited=true;
@@ -128,7 +128,7 @@ public class MapReduceStat {
         while(itermaptl.hasNext()){
             MapTotalStat ts=itermaptl.next();
             if (!ts.isWrited){
-            writeStat("MapLogAv_"+Agent.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
+            writeStat("MapLogAv_"+Main.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
                 "map av"+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(ts.date))+" "+ts.agentAddress+" "+ts.taskid+" "+
                     Long.toString(ts.time));
                 ts.isWrited=true;
@@ -139,7 +139,7 @@ public class MapReduceStat {
         while(iterrd.hasNext()){
             ReduceStat tsr=iterrd.next();
             if (!tsr.isWrited){
-            writeStat("MapLogReduce_"+Agent.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
+            writeStat("MapLogReduce_"+Main.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
                 "reduce "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(tsr.date))+" "+tsr.agentAddress+" "+tsr.taskid+" "+
                     Long.toString(tsr.time));
                 tsr.isWrited=true;
@@ -150,7 +150,7 @@ public class MapReduceStat {
         while(iterrdld.hasNext()){
             ReduceLeaderStat tsrl=iterrdld.next();
             if (!tsrl.isWrited){
-                writeStat("MapLogLeader_"+Agent.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
+                writeStat("MapLogLeader_"+Main.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
                 "reduce leader "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(tsrl.date))+" "+tsrl.agentAddress+" "+tsrl.taskid+" "+
                     Long.toString(tsrl.time));
                 tsrl.isWrited=true;
@@ -161,7 +161,7 @@ public class MapReduceStat {
         //while(mrs_iter.hasNext()){
            // MRTimeStat mrstat=mrs_iter.next();
             //if (!mrstat.isWrited){
-               // writeStat("MapLogLeader_"+Agent.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
+               // writeStat("MapLogLeader_"+Main.getAgentAddress()+"-"+(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))+".log",
                 //"reduce leader "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(tsrl.date))+" "+tsrl.agentAddress+" "+tsrl.taskid+" "+
                 //    Long.toString(tsrl.time));
               //  tsrl.isWrited=true;
@@ -173,13 +173,13 @@ public class MapReduceStat {
         try {
             pwriter = new PrintWriter(new BufferedWriter(new FileWriter(logFile, true)));
         } catch (FileNotFoundException ex) {
-            Agent.log.error(ProcessFile.class.getName()+" . Error create log file for MapReduce "+ex);
+            Main.log.error(ProcessFile.class.getName()+" . Error create log file for MapReduce "+ex);
         } catch (IOException ex) {
-            Agent.log.error(ProcessFile.class.getName()+" . IO Error while create log file for MapReduce "+ex);
+            Main.log.error(ProcessFile.class.getName()+" . IO Error while create log file for MapReduce "+ex);
         }
         pwriter.append(line);
         
-        //pwriter.append("map "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()))+" "+Agent.getAgentAddress()+" "+session+" "+fileName+" "+
+        //pwriter.append("map "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()))+" "+Main.getAgentAddress()+" "+session+" "+fileName+" "+
         //            Long.toString(time);
         pwriter.println();
         pwriter.close();
@@ -258,7 +258,7 @@ public class MapReduceStat {
                 mrtimestat.poll();
             }
         }
-        Agent.log.info("mrtimestat="+json.toString());
+        Main.log.info("mrtimestat="+json.toString());
         try{
             HttpConn httpconn = new HttpConn();
             httpconn.setup(host,port); 
@@ -267,7 +267,7 @@ public class MapReduceStat {
             httpconn.connect();
             httpconn.close();
         } catch (UnknownHostException ex) {
-            Agent.log.error("MapReduceStat "+ex.getLocalizedMessage());
+            Main.log.error("MapReduceStat "+ex.getLocalizedMessage());
         } catch (Exception ex) {
             Logger.getLogger(MapReduceStat.class.getName()).log(Level.SEVERE, null, ex);
         }

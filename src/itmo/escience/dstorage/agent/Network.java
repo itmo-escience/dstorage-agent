@@ -61,16 +61,16 @@ public class Network {
         JSONObject jsonStatus = new JSONObject();
         //log.info(AgentInetAddress.getHostAddress());  
         jsonStatus.put("action", "status");
-        jsonStatus.put("ip", Agent.getAgentAddress());
-        jsonStatus.put("port", Agent.getConfig().getProperty("AgentPort"));
+        jsonStatus.put("ip", Main.getAgentAddress());
+        jsonStatus.put("port", Main.getConfig().getProperty("AgentPort"));
         jsonStatus.put("freeHDD", Long.toString(AgentSystem.returnCurrentQuota()));
-        if(Agent.getSsdQuota()!=null && Agent.agentSsdDocRoot!=null ) jsonStatus.put("freeSSD", Long.toString(AgentSystem.returnSsdCurrentQuota()));
-        if(Agent.getMemQuota()!=null) jsonStatus.put("freeRAM", Long.toString(Agent.getStorageLayer().getFreeMemToUse()));
-        jsonStatus.put("totalHDD", Agent.getAgentDocRoot().getTotalSpace());
-        jsonStatus.put("totalSSD", Agent.getAgentSSDDocRoot().getTotalSpace());
+        if(Main.getSsdQuota()!=null && Main.agentSsdDocRoot!=null ) jsonStatus.put("freeSSD", Long.toString(AgentSystem.returnSsdCurrentQuota()));
+        if(Main.getMemQuota()!=null) jsonStatus.put("freeRAM", Long.toString(Main.getStorageLayer().getFreeMemToUse()));
+        jsonStatus.put("totalHDD", Main.getAgentDocRoot().getTotalSpace());
+        jsonStatus.put("totalSSD", Main.getAgentSSDDocRoot().getTotalSpace());
         jsonStatus.put("totalRAM", StorageLayer.getTotalPhisicalMemory());
         response.setStatusCode(HttpStatus.SC_OK);
-        Agent.log.info(jsonStatus.toString());                        
+        Main.log.info(jsonStatus.toString());                        
         StringEntity strEntRequest = new StringEntity (jsonStatus.toString());
         strEntRequest.setContentType("application/json");     
         response.setEntity(strEntRequest);       
@@ -79,40 +79,40 @@ public class Network {
         
         JSONObject jsonRegister = new JSONObject();
         jsonRegister.put("action", "register");
-        jsonRegister.put("ip",  Agent.getAgentAddress());
-        jsonRegister.put("port", Agent.getConfig().getProperty("AgentPort"));
-        if (Agent.getConfig().isProperty("ExternalIP")){
+        jsonRegister.put("ip",  Main.getAgentAddress());
+        jsonRegister.put("port", Main.getConfig().getProperty("AgentPort"));
+        if (Main.getConfig().isProperty("ExternalIP")){
             //validate ip address            
-            if (!AgentSystem.isIPv4Address(Agent.getConfig().getProperty("ExternalIP"))){
-                Agent.log.info("ExternalIP option has wrong format");
+            if (!AgentSystem.isIPv4Address(Main.getConfig().getProperty("ExternalIP"))){
+                Main.log.info("ExternalIP option has wrong format");
             }
             else {
-                jsonRegister.put("external_ip", Agent.getConfig().getProperty("ExternalIP"));
+                jsonRegister.put("external_ip", Main.getConfig().getProperty("ExternalIP"));
             }
         }
-        if (Agent.getConfig().isProperty("ExternalPort")){
+        if (Main.getConfig().isProperty("ExternalPort")){
             //TODO char     
-            System.out.println("parseint="+Integer.parseInt(Agent.getConfig().getProperty("ExternalPort")));
-            if (Integer.parseInt(Agent.getConfig().getProperty("ExternalPort"))>=0 && Integer.parseInt(Agent.getConfig().getProperty("ExternalPort"))<65536 )
+            System.out.println("parseint="+Integer.parseInt(Main.getConfig().getProperty("ExternalPort")));
+            if (Integer.parseInt(Main.getConfig().getProperty("ExternalPort"))>=0 && Integer.parseInt(Main.getConfig().getProperty("ExternalPort"))<65536 )
                 {
-                jsonRegister.put("external_port", Agent.getConfig().getProperty("ExternalPort"));
-                   // Agent.log.info("ExternalPort out of range (0-65535)");
+                jsonRegister.put("external_port", Main.getConfig().getProperty("ExternalPort"));
+                   // Main.log.info("ExternalPort out of range (0-65535)");
             }
             else {
-                Agent.log.info("ExternalPort out of range (0-65535)");
-                //jsonRegister.put("external_port", Agent.getConfig().getProperty("ExternalPort"));
+                Main.log.info("ExternalPort out of range (0-65535)");
+                //jsonRegister.put("external_port", Main.getConfig().getProperty("ExternalPort"));
             }
         }
         jsonRegister.put("freeHDD", AgentSystem.returnCurrentQuota());
-        if(Agent.getSsdQuota()!=null && Agent.agentSsdDocRoot!=null ) jsonRegister.put("freeSSD", Long.toString(AgentSystem.returnSsdCurrentQuota()));
-        if(Agent.getMemQuota()!=null) jsonRegister.put("freeRAM", Long.toString(Agent.getStorageLayer().getFreeMemToUse()));
-        jsonRegister.put("totalHDD", Agent.getAgentDocRoot().getTotalSpace());
-        jsonRegister.put("pathHDD", Agent.getAgentDocRoot().getAbsolutePath());
-        jsonRegister.put("pathSSD", Agent.getAgentSSDDocRoot().getAbsolutePath());
-        jsonRegister.put("totalSSD", Agent.getAgentSSDDocRoot().getTotalSpace());
+        if(Main.getSsdQuota()!=null && Main.agentSsdDocRoot!=null ) jsonRegister.put("freeSSD", Long.toString(AgentSystem.returnSsdCurrentQuota()));
+        if(Main.getMemQuota()!=null) jsonRegister.put("freeRAM", Long.toString(Main.getStorageLayer().getFreeMemToUse()));
+        jsonRegister.put("totalHDD", Main.getAgentDocRoot().getTotalSpace());
+        jsonRegister.put("pathHDD", Main.getAgentDocRoot().getAbsolutePath());
+        jsonRegister.put("pathSSD", Main.getAgentSSDDocRoot().getAbsolutePath());
+        jsonRegister.put("totalSSD", Main.getAgentSSDDocRoot().getTotalSpace());
         jsonRegister.put("totalRAM", StorageLayer.getTotalPhisicalMemory());
-        jsonRegister.put("version",Agent.getAgentVersion());
-        jsonRegister.put("region",Agent.getRegion());  
+        jsonRegister.put("version",Main.getAgentVersion());
+        jsonRegister.put("region",Main.getRegion());  
         jsonRegister.put("java_version",System.getProperty("java.version"));    
         jsonRegister.put("os_arch",System.getProperty("os.arch")); 
         jsonRegister.put("os_name",System.getProperty("os.name")); 
@@ -134,18 +134,18 @@ public class Network {
         HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
         HttpContext context = new BasicHttpContext(null);
 
-        HttpHost host = new HttpHost(Agent.getConfig().getProperty("StorageCoreAddress"),Integer.valueOf(Agent.getConfig().getProperty("StorageCorePort")));        
+        HttpHost host = new HttpHost(Main.getConfig().getProperty("StorageCoreAddress"),Integer.valueOf(Main.getConfig().getProperty("StorageCorePort")));        
         DefaultHttpClientConnection conn = new DefaultHttpClientConnection();
         context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
         context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, host);
         Socket socket = new Socket(host.getHostName(), host.getPort());
         conn.bind(socket, params);
         StringEntity strEntRegister = new StringEntity (jsonRegister.toString());
-        Agent.log.info("JSON to StorageCore:"+jsonRegister.toString());
+        Main.log.info("JSON to StorageCore:"+jsonRegister.toString());
         strEntRegister.setContentType("application/json");                             
         HttpPost post =new HttpPost("/agent_register");  
         post.setEntity(strEntRegister);
-        Agent.log.info(">> Register URI: " + post.getRequestLine().getUri());
+        Main.log.info(">> Register URI: " + post.getRequestLine().getUri());
         post.setParams(params);
         try {
             httpexecutor.preProcess(post, httpproc, context);
@@ -162,7 +162,7 @@ public class Network {
             JSONObject jsonResponse= new JSONObject();
             jsonResponse = (JSONObject)jsonParser.parse(AgentSystem.getStringFromInputStream(inputstreamEnRequest)); 
             if (!(jsonResponse.containsKey("pKey"))){
-                       Agent.log.error(jsonResponse.toString());
+                       Main.log.error(jsonResponse.toString());
                     return;
                 } 
             String pKey = (String)jsonResponse.get("pKey"); 
@@ -170,10 +170,10 @@ public class Network {
             KeyFactory fact = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(decode64pKey);
             //publicKey = (PublicKey)fact.generatePublic(x509KeySpec);
-            Agent.setPublicKey((PublicKey)fact.generatePublic(x509KeySpec));
-            //Agent.log.info("publicKey="+Agent.getPublicKey().toString());
+            Main.setPublicKey((PublicKey)fact.generatePublic(x509KeySpec));
+            //Agent.log.info("publicKey="+Main.getPublicKey().toString());
         } catch (Exception ex) {
-            Agent.log.error("Exception in registerAgent() "+ex.getLocalizedMessage());
+            Main.log.error("Exception in registerAgent() "+ex.getLocalizedMessage());
         }       
     }   
         public static void doGetFileFromAgent(
@@ -196,8 +196,8 @@ public class Network {
         HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
         HttpContext context = new BasicHttpContext(null);
         //URL urlAgent= new URL (jsonResponse.get("agent_uri").toString());
-        Agent.log.info("URI host:"+urlAgent.getHost().toString());
-        Agent.log.info("URI port:"+urlAgent.getPort());
+        Main.log.info("URI host:"+urlAgent.getHost().toString());
+        Main.log.info("URI port:"+urlAgent.getPort());
         HttpHost host = new HttpHost(urlAgent.getHost(),urlAgent.getPort());        
         DefaultHttpClientConnection conn = new DefaultHttpClientConnection();
         context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
@@ -208,24 +208,24 @@ public class Network {
         }
         BasicHttpRequest requestGet = new BasicHttpRequest("GET", urlAgent.getFile()+fileid);
         //BasicHttpRequest requestGet = new BasicHttpRequest("GET", urlAgent.getFile()+file.getName());
-        Agent.log.info(">> Request URI: " + requestGet.getRequestLine().getUri());
+        Main.log.info(">> Request URI: " + requestGet.getRequestLine().getUri());
         requestGet.setParams(params);
         httpexecutor.preProcess(requestGet, httpproc, context);
         HttpResponse responseOnGet = httpexecutor.execute(requestGet, conn, context);
         responseOnGet.setParams(params);
-        if ((Agent.getConfig().isProperty("Security"))){
-            if (Agent.getConfig().getProperty("Security").equals("2")){
+        if ((Main.getConfig().isProperty("Security"))){
+            if (Main.getConfig().getProperty("Security").equals("2")){
             requestGet.setHeader("Ticket", jsonRequest.get("Ticket").toString());
             requestGet.setHeader("Sign", jsonRequest.get("Sign").toString());
             }
         }
         httpexecutor.postProcess(responseOnGet, httpproc, context);
-        Agent.log.info("<< Response: " + responseOnGet.getStatusLine());
+        Main.log.info("<< Response: " + responseOnGet.getStatusLine());
           
         if (String.valueOf(responseOnGet.getStatusLine().getStatusCode()).equalsIgnoreCase("200")){
             HttpEntity enRequest = responseOnGet.getEntity();
             InputStream inputstreamEnRequest = enRequest.getContent();
-            File file = new File(Agent.getConfig().getProperty("AgentdocRoot")+File.separatorChar+fileid); 
+            File file = new File(Main.getConfig().getProperty("AgentdocRoot")+File.separatorChar+fileid); 
             //OutputStream outFile = new FileOutputStream(new File(file.getPath()));
             OutputStream outFile = new FileOutputStream(file.getPath());
             int intBytesRead=0;
@@ -240,8 +240,8 @@ public class Network {
             jsonRequestCore.put("action", "ack");
             jsonRequestCore.put("file_size", Long.toString(file.length()));
             jsonRequestCore.put("id", file.getName());
-            jsonRequestCore.put("ip", Agent.getAgentAddress());
-            jsonRequestCore.put("port", Agent.getConfig().getProperty("AgentPort"));
+            jsonRequestCore.put("ip", Main.getAgentAddress());
+            jsonRequestCore.put("port", Main.getConfig().getProperty("AgentPort"));
             //jsonRequest.put("agent_ipaddress", urlAgent.getHost());
             //jsonRequest.put("agent_port", String.valueOf(urlAgent.getPort()));
             returnDownloadFileStatus(jsonRequestCore);
@@ -251,11 +251,11 @@ public class Network {
             jsonRequestCore.put("action", "ack");
             jsonRequestCore.put("file_size", "0");
             jsonRequestCore.put("id", fileid);
-            jsonRequestCore.put("ip", Agent.getAgentAddress());
-            jsonRequestCore.put("port", Agent.getConfig().getProperty("AgentPort"));
+            jsonRequestCore.put("ip", Main.getAgentAddress());
+            jsonRequestCore.put("port", Main.getConfig().getProperty("AgentPort"));
             returnDownloadFileStatus(jsonRequestCore);
         }
-        Agent.log.info("==============");
+        Main.log.info("==============");
     }
         
   public static void returnDownloadFileStatus (JSONObject jsonRequest) throws Exception, HttpException{
@@ -278,8 +278,8 @@ public class Network {
 
         HttpContext context = new BasicHttpContext(null);
        
-        HttpHost host = new HttpHost(Agent.getConfig().getProperty("StorageCoreAddress"), 
-                    Integer.valueOf(Agent.getConfig().getProperty("StorageCorePort")));
+        HttpHost host = new HttpHost(Main.getConfig().getProperty("StorageCoreAddress"), 
+                    Integer.valueOf(Main.getConfig().getProperty("StorageCorePort")));
         
         DefaultHttpClientConnection conn = new DefaultHttpClientConnection();
         ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
@@ -291,21 +291,21 @@ public class Network {
                     Socket socket = new Socket(host.getHostName(), host.getPort());
                     conn.bind(socket, params);
                  
-                Agent.log.info(jsonRequest.toString());                        
+                Main.log.info(jsonRequest.toString());                        
                 StringEntity strEntRequest = new StringEntity (jsonRequest.toString());
                 strEntRequest.setContentType("application/json");
                 
                 //Post to StorageCore with json
                 HttpPost post =new HttpPost("/dsagent");  
                 post.setEntity(strEntRequest);
-                Agent.log.info(">> Request URI: " + post.getRequestLine().getUri());
+                Main.log.info(">> Request URI: " + post.getRequestLine().getUri());
                 post.setParams(params);
                 httpexecutor.preProcess(post, httpproc, context);
                 //parseResponsefromStorageCore
                 HttpResponse response = httpexecutor.execute(post, conn, context);
                 response.setParams(params);
                 httpexecutor.postProcess(response, httpproc, context);
-                Agent.log.info("<< Response: " + response.getStatusLine());
+                Main.log.info("<< Response: " + response.getStatusLine());
                 //handle response: parse response json from Core and get agent_uri and file_id 
                 ///HttpEntity enResponse = response.getEntity();
                 //InputStream inputstreamEnRequest = enResponse.getContent(); 

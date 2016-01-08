@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.handlers;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.utils.HttpConn;
 import itmo.escience.dstorage.agent.Network;
 import itmo.escience.dstorage.agent.StorageLayer;
@@ -59,8 +59,8 @@ public class AgentGetFileHandler implements Runnable{
             HttpConn httpconn = new HttpConn();
             httpconn.setup(ip,port);
             httpconn.setMethod("GET",fileid);
-            if ((Agent.getConfig().isProperty("Security"))){
-                if (Agent.getConfig().getProperty("Security").equals("2")){
+            if ((Main.getConfig().isProperty("Security"))){
+                if (Main.getConfig().getProperty("Security").equals("2")){
                     if (!Ticket.validateStorageTicket(request)) return;
                     httpconn.setHeader("Ticket", request.getHeader("Ticket"));
                     httpconn.setHeader("Sign", request.getHeader("Sign")); 
@@ -74,7 +74,7 @@ public class AgentGetFileHandler implements Runnable{
             coreResponse.setFileId(fileid);
             coreResponse.setLvl(levelto);
             if(httpconn.getStatusCode()==HttpStatus.SC_OK)
-                coreResponse.setSize(Agent.getStorageLayer().addFile(levelto, is, fileid));    
+                coreResponse.setSize(Main.getStorageLayer().addFile(levelto, is, fileid));    
             else
                 coreResponse.setSize(0L);
             coreResponse.setCmd(request.getAgentCommand());

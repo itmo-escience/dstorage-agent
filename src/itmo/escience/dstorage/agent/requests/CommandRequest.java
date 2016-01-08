@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.requests;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.Ticket;
 import itmo.escience.dstorage.agent.handlers.AgentGetFileHandler;
 import itmo.escience.dstorage.agent.handlers.DownloadFileHandler;
@@ -45,13 +45,13 @@ lvl2 - 0,1,2 (to)
         
     }
     private void parseRequestLine(String line){
-        Agent.log.info("Request line parse = " +line);
+        Main.log.info("Request line parse = " +line);
         String[] parseStr=line.split("[/]");
         for(String s:parseStr[2].split("&")){
             String[] p=s.split("=");
             param.put(p[0].toUpperCase(),p[1]);
         }
-        Agent.log.info("Parse result: " +param.toString());
+        Main.log.info("Parse result: " +param.toString());
         if(param.containsKey(AgentRequestType.CMD.name()))commandType=AgentCommand.valueOf(param.get(AgentRequestType.CMD.name()).toUpperCase());        
     }
     public boolean isParam(String key){return param.containsKey(key);}
@@ -70,7 +70,7 @@ lvl2 - 0,1,2 (to)
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
                     AgentSystemStatus.FAILED));     
-                    Agent.log.info(response.getMessage());
+                    Main.log.info(response.getMessage());
                     return response;
                 }
                 LvlMgmtHandler lvlHandlerDel=new LvlMgmtHandler(this);
@@ -82,7 +82,7 @@ lvl2 - 0,1,2 (to)
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
                     AgentSystemStatus.FAILED));     
-                    Agent.log.info(response.getMessage());
+                    Main.log.info(response.getMessage());
                     return response;
                 }
                 LvlMgmtHandler lvlHandler=new LvlMgmtHandler(this);
@@ -94,14 +94,14 @@ lvl2 - 0,1,2 (to)
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
                     AgentSystemStatus.FAILED)); 
-                    Agent.log.info(response.getMessage());
+                    Main.log.info(response.getMessage());
                     return response;
                 }
                 AgentGetFileHandler getFileHandler=new AgentGetFileHandler(this);
                 Thread threadGetFile=new Thread(getFileHandler);
                 threadGetFile.start();
                 break;
-                //getFileHandler.start();
+                //getFileHandler.start();                //getFileHandler.start();
         }        
         return response;
     }

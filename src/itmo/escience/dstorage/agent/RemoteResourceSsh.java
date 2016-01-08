@@ -50,8 +50,8 @@ public class RemoteResourceSsh {
            session.setPassword(configSession.getPwd());
            session.connect();
         } catch (JSchException jsche) {
-            Agent.log.info("Error communicating with SSH Remote Resource " +configSession.getAddr().getHostAddress());
-            Agent.log.info("SSH connection error "+jsche.getLocalizedMessage());
+            Main.log.info("Error communicating with SSH Remote Resource " +configSession.getAddr().getHostAddress());
+            Main.log.info("SSH connection error "+jsche.getLocalizedMessage());
             return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,jsche.getLocalizedMessage());
         }
         return AgentSystem.createMsgStatus(AgentSystem.STATUS_OK,"");
@@ -65,22 +65,22 @@ public class RemoteResourceSsh {
             try {
                 ChannelSftp sftpChannel = (ChannelSftp) channel;
                 if (isGet){
-                    sftpChannel.get(strRemoteFileName, Agent.getAgentDocRoot().getPath()+File.separatorChar+strLocalFileName);
-                    jsonResult.put("file_size",Long.toString((new File(Agent.getAgentDocRoot().getPath()+File.separatorChar+strLocalFileName)).length()));
+                    sftpChannel.get(strRemoteFileName, Main.getAgentDocRoot().getPath()+File.separatorChar+strLocalFileName);
+                    jsonResult.put("file_size",Long.toString((new File(Main.getAgentDocRoot().getPath()+File.separatorChar+strLocalFileName)).length()));
                 } else {
-                    File fLocal = new File(Agent.getAgentDocRoot().getPath()+File.separatorChar+strLocalFileName);
+                    File fLocal = new File(Main.getAgentDocRoot().getPath()+File.separatorChar+strLocalFileName);
                     sftpChannel.put(new FileInputStream(fLocal), strRemoteFileName);                    
                 }
                 jsonResult.put("file_id",strLocalFileName);
                 //cmdResult.statusCode=Integer.toString(sftpChannel.getExitStatus());
                 sftpChannel.exit();
             } catch (SftpException e) {
-                Agent.log.info("Error while copy file with SSH Resource " +configSession.getAddr().getHostAddress());
+                Main.log.info("Error while copy file with SSH Resource " +configSession.getAddr().getHostAddress());
                 return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,"Error while copy file "+e.getLocalizedMessage());
             }
                       
        } catch (JSchException e) {
-                Agent.log.info("Error communicating with SSH Remote Resource " +configSession.getAddr().getHostAddress());
+                Main.log.info("Error communicating with SSH Remote Resource " +configSession.getAddr().getHostAddress());
                 return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,e.getLocalizedMessage());
             } finally {
                 if (channel != null) {
@@ -125,7 +125,7 @@ public class RemoteResourceSsh {
                 return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,"Error while list directory");
             } 
             } catch (JSchException e) {
-                Agent.log.info("Error communicating with Ssh Remote Resource " +configSession.getAddr().getHostAddress());
+                Main.log.info("Error communicating with Ssh Remote Resource " +configSession.getAddr().getHostAddress());
                 return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,e.getLocalizedMessage());
             } finally {
                 if (channel != null) {
@@ -165,7 +165,7 @@ public class RemoteResourceSsh {
             else 
                 cmdResult.strCommandOutput=resultEr;
             } catch (JSchException e) {
-                Agent.log.info("Error communicating with Ssh Remote Resource " +configSession.getAddr().getHostName());
+                Main.log.info("Error communicating with Ssh Remote Resource " +configSession.getAddr().getHostName());
                 return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,e.getLocalizedMessage());
             } finally {
                 if (channel != null) {

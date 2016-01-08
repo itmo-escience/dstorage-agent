@@ -52,19 +52,19 @@ public class Reduce implements Runnable{
         this.aObj=new ArrayList<Object>();
         //check that jar file parsed for reduce
         
-        if (!(new File(Agent.getAgentDocRoot()+File.separator+request.name+"-MRSerializatorJR.jar")).exists()){
+        if (!(new File(Main.getAgentDocRoot()+File.separator+request.name+"-MRSerializatorJR.jar")).exists()){
             
-            if(!JarVerifier.verify(request.name, DefinitionAvgResult.JoinResults)) {Agent.log.error(Reduce.class.getName()+" Error while verify jar file.");return;}
+            if(!JarVerifier.verify(request.name, DefinitionAvgResult.JoinResults)) {Main.log.error(Reduce.class.getName()+" Error while verify jar file.");return;}
             MRHandlerParser parser=new MRHandlerParser(request.name,method,"MRSerializatorJR");
-            if(!parser.parseJar()) {Agent.log.error(Reduce.class.getName()+" Error while parse jar file.");return;}
-            parser.writeProto(Agent.getAgentDocRoot()+File.separator+request.proto);            
-            parser.invokeProtoc(Agent.getAgentDocRoot()+File.separator+request.proto);
+            if(!parser.parseJar()) {Main.log.error(Reduce.class.getName()+" Error while parse jar file.");return;}
+            parser.writeProto(Main.getAgentDocRoot()+File.separator+request.proto);            
+            parser.invokeProtoc(Main.getAgentDocRoot()+File.separator+request.proto);
             parser.generateSrc();
             parser.generateSerializator();
         }
         URL url,url2;
-        url = new URL("file:"+Agent.getAgentDocRoot().getPath()+File.separator+this.request.name);
-        url2 = new URL("file:"+Agent.getAgentDocRoot()+File.separator+this.request.name+"-MRSerializatorJR.jar");
+        url = new URL("file:"+Main.getAgentDocRoot().getPath()+File.separator+this.request.name);
+        url2 = new URL("file:"+Main.getAgentDocRoot()+File.separator+this.request.name+"-MRSerializatorJR.jar");
         urlClassLoader = new URLClassLoader (new URL[] {url,url2});        
     }
     public void addObject(byte[] data){
@@ -77,7 +77,7 @@ public class Reduce implements Runnable{
         try {
 
             Class<?> cl = Class.forName (method.getJarClassName(), true, urlClassLoader);
-            Agent.log.info("Object class="+aObj.size());
+            Main.log.info("Object class="+aObj.size());
             //Method join = cl.getMethod(method.getMethodName(), new Class[]{Object[].class});
             Method join = cl.getMethod(method.getMethodName(), method.getMethodParameters());
             
@@ -125,14 +125,14 @@ public class Reduce implements Runnable{
                     //TODO change to protobuf result write to file
                     writeDataFile(request.datafile,serializeResult(res));
                     //WORKAROUND for repeated jar usage
-                    if(!(new File(Agent.getAgentDocRoot()+File.separator+request.proto)).exists())
-                        writeProto(Agent.getAgentDocRoot()+File.separator+request.proto);
+                    if(!(new File(Main.getAgentDocRoot()+File.separator+request.proto)).exists())
+                        writeProto(Main.getAgentDocRoot()+File.separator+request.proto);
                     //check that proto file exist if not create
                     //writeProto(request.proto);
                     JSONObject ackjson=new JSONObject();
                     ackjson.put("action","ack");
                     ackjson.put("map_reduce", "true");
-                    ackjson.put("agent_ipaddress", Agent.getAgentAddress());
+                    ackjson.put("agent_ipaddress", Main.getAgentAddress());
                     ackjson.put("id", request.task_id);                   
                     //reduceRes=ackjson;
                     httpconn.setup(request.backURI.split(":")[0],request.backURI.split(":")[1]);  
@@ -141,9 +141,9 @@ public class Reduce implements Runnable{
                     break;
             }
             if (request.type==MapReduceRequestType.REDUCE)
-                Agent.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t6);
+                Main.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t6);
             else 
-                Agent.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t8);
+                Main.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t8);
             httpconn.connect();
             httpconn.close();
             
@@ -156,7 +156,7 @@ public class Reduce implements Runnable{
     }
     private void writeDataFile(String file, byte[] data) throws FileNotFoundException, IOException{
         InputStream is = new ByteArrayInputStream(data);
-        OutputStream outFile = new FileOutputStream(Agent.getAgentDocRoot().getPath() +File.separatorChar+ file);
+        OutputStream outFile = new FileOutputStream(Main.getAgentDocRoot().getPath() +File.separatorChar+ file);
         int intBytesRead=0;
         byte[] bytes = new byte[4096];
         while ((intBytesRead=is.read(bytes))!=-1)
@@ -175,10 +175,10 @@ public class Reduce implements Runnable{
             Method getSerial = cl.getMethod("getSerialized", new Class<?>[] {Object.class});
             bytes=(byte[])getSerial.invoke(cl.newInstance(),ob);            
         } catch (ClassNotFoundException ex) {
-            Agent.log.error(Reduce.class.getName()+" . ClassNotFoundException "+ex);
+            Main.log.error(Reduce.class.getName()+" . ClassNotFoundException "+ex);
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
-            Agent.log.error(Reduce.class.getName()+" . NoSuchMethodException "+ex);
+            Main.log.error(Reduce.class.getName()+" . NoSuchMethodException "+ex);
         } catch (InstantiationException ex) {
             Logger.getLogger(Reduce.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
@@ -198,10 +198,10 @@ public class Reduce implements Runnable{
             Method getSerial = cl.getMethod("getDeserialized", new Class<?>[] {byte[].class});
             res=getSerial.invoke(cl.newInstance(),data);                       
         } catch (ClassNotFoundException ex) {
-            Agent.log.error(Reduce.class.getName()+" . ClassNotFoundException "+ex);
+            Main.log.error(Reduce.class.getName()+" . ClassNotFoundException "+ex);
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
-            Agent.log.error(Reduce.class.getName()+" . NoSuchMethodException "+ex);
+            Main.log.error(Reduce.class.getName()+" . NoSuchMethodException "+ex);
         } catch (InstantiationException ex) {
             Logger.getLogger(Reduce.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {

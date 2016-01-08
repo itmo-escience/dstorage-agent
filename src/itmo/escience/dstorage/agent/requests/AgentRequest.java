@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.requests;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.responses.AgentResponse;
 import itmo.escience.dstorage.agent.utils.AgentMessage;
 import java.io.UnsupportedEncodingException;
@@ -28,7 +28,7 @@ public abstract class AgentRequest {
         for(Header header:httpHeaders)
             headers.put(header.getName(),header.getValue());
         try {
-            target=URLDecoder.decode(httpRequest.getRequestLine().getUri(),Agent.getLocalEncoding());
+            target=URLDecoder.decode(httpRequest.getRequestLine().getUri(),Main.getLocalEncoding());
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(AgentRequest.class.getName()).log(Level.SEVERE, null, ex);
         }       
@@ -46,7 +46,7 @@ public abstract class AgentRequest {
     public void initContentType(){
         if(target.contains("?")){//there is contentType inside request from client, keep them and return entity with
             contentType=ContentType.parse((target.split("/?", 2)[1]).split("=", 2)[1]);
-            Agent.log.info("CT detected = " +contentType.toString());
+            Main.log.info("CT detected = " +contentType.toString());
             //keep only name of file in target variable
             target=target.split("\\?",2)[0];
         }

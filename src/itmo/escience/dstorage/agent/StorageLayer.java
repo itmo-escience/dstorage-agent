@@ -43,7 +43,7 @@ public class StorageLayer {
         agentProp=new AgentProperties();
         for(String mpfile:agentProp.retrieve())
             mapFileToMem(new File(fileToHddPath(mpfile)));
-        Agent.log.info("Load to memory:"+mappedFiles.keySet());
+        Main.log.info("Load to memory:"+mappedFiles.keySet());
     }
     public void setPath(StorageLevel type,String path){paths.put(type, path);}
     public void setQuota(StorageLevel type,long size){quotas.put(type, size);}
@@ -90,7 +90,7 @@ public class StorageLayer {
         return size;
     }
     public long getFreeMemToUse(){
-        long quota=Long.parseLong(Agent.getMemQuota());
+        long quota=Long.parseLong(Main.getMemQuota());
         //if((quota-memUsage)<0) return 0;
         return quota-memUsage>0?quota-memUsage:0;
     }
@@ -208,13 +208,13 @@ public class StorageLayer {
             ByteBuffer mapped=readFileInMem(filename);
             mapped.position(0);
             byte[] bytes=null;
-            //if(mapped.isLoaded()){Agent.log.info("Mapped loaded");}
+            //if(mapped.isLoaded()){Main.log.info("Mapped loaded");}
             if(mapped.hasArray()){
-                Agent.log.info("Mapped direct");
+                Main.log.info("Mapped direct");
                 bytes=mapped.array();
             }
             else{
-                Agent.log.info("Mapped indirect:"+mapped.capacity());
+                Main.log.info("Mapped indirect:"+mapped.capacity());
                 bytes=new byte[mapped.capacity()];
                 mapped.get(bytes);
             }
@@ -232,11 +232,11 @@ public class StorageLayer {
             mapped.position(0);
             byte[] bytes=null;
             if(mapped.hasArray()){
-                Agent.log.info("Mapped direct");
+                Main.log.info("Mapped direct");
                 bytes=mapped.array();
             }
             else{
-                Agent.log.info("Mapped indirect:"+mapped.capacity());
+                Main.log.info("Mapped indirect:"+mapped.capacity());
                 bytes=new byte[mapped.capacity()];
                 mapped.get(bytes);
             }
@@ -289,10 +289,10 @@ public class StorageLayer {
         return is;
     }
     private static String fileToSsdPath(String filename){
-        return Agent.getAgentSSDDocRoot().getPath()+File.separatorChar+ filename;
+        return Main.getAgentSSDDocRoot().getPath()+File.separatorChar+ filename;
     }
     private static String fileToHddPath(String filename){
-        return Agent.getAgentDocRoot().getPath() +File.separatorChar+ filename;
+        return Main.getAgentDocRoot().getPath() +File.separatorChar+ filename;
     }
     private long addToDisk(InputStream is,String path){
         OutputStream outStream;             
@@ -314,8 +314,8 @@ public class StorageLayer {
     }
     private boolean mapFileToMem(File file){
         //check that quota not exceeded
-        //System.out.println(Agent.getMemQuota());
-        if(memUsage>Long.parseLong(Agent.getMemQuota()))return false;
+        //System.out.println(Main.getMemQuota());
+        if(memUsage>Long.parseLong(Main.getMemQuota()))return false;
         try {
             FileChannel fileChannel=new RandomAccessFile(file,"r").getChannel();
             MappedByteBuffer fileInMem=fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
@@ -333,7 +333,7 @@ public class StorageLayer {
     private boolean fileToMem(File file){
         int bytesRead=-1;
         try {
-            if(memUsage>Long.parseLong(Agent.getMemQuota()))return false;
+            if(memUsage>Long.parseLong(Main.getMemQuota()))return false;
             FileChannel fileChannel=new RandomAccessFile(file,"r").getChannel();
             ByteBuffer buf = ByteBuffer.allocate((int)file.length());
             bytesRead = fileChannel.read(buf);

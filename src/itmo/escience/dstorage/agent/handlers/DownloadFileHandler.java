@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.handlers;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.StorageLayer;
 import itmo.escience.dstorage.agent.Ticket;
 import itmo.escience.dstorage.agent.requests.AgentRequest;
@@ -45,7 +45,7 @@ public class DownloadFileHandler implements IRequestHandler {
     public AgentResponse handle(AgentRequest agentRequest) {
         response=new DownloadFileResponse();
         if(!validateRequest(agentRequest))return response;
-        StorageLayer layer=Agent.getStorageLayer();
+        StorageLayer layer=Main.getStorageLayer();
         
         String filename = this.request.getTarget();
         
@@ -81,7 +81,7 @@ public class DownloadFileHandler implements IRequestHandler {
                         //TODO 
                         //FileEntity body = new FileEntity(file, request.getFirstHeader("Accept").toString());
                         //if (request.containsHeader("Accept")){
-                        //    Agent.log.info("Request Accept : " + request.getFirstHeader("Accept").getValue());
+                        //    Main.log.info("Request Accept : " + request.getFirstHeader("Accept").getValue());
                         //}
                         
                 

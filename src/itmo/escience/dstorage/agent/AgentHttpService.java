@@ -86,7 +86,7 @@ public class AgentHttpService {
                     response.setEntity(entity);                    
                     break;
                 case DELETE:
-                    Agent.log.info("DELETE Method Detected");
+                    Main.log.info("DELETE Method Detected");
                     try {
                         //AgentRequest requestDelete=RequestFactory.create(request);
                         //AgentResponse responseDelete=requestDelete.process();
@@ -98,31 +98,31 @@ public class AgentHttpService {
                         
                         //AgentMethodHandler.handleMethodDELETE(request,response);
                     } catch (Exception ex) {
-                        Agent.log.error("Exception handleMethodDELETE "+ex.getMessage());
+                        Main.log.error("Exception handleMethodDELETE "+ex.getMessage());
                     } 
                     break;
                 case GET: 
-                    Agent.log.info("GET Method Detected");
+                    Main.log.info("GET Method Detected");
                     try {    
                         AgentMethodHandler.handleMethodGET(request,response);
                     } catch (Exception ex) {
-                        Agent.log.error("Exception handleMethodGET "+ex.getMessage());
+                        Main.log.error("Exception handleMethodGET "+ex.getMessage());
                         
                     }                                          
                     break;
                 case POST:
-                    Agent.log.info("POST Method Detected");
+                    Main.log.info("POST Method Detected");
                 case PUT:
-                    Agent.log.info("PUT Method Detected");    
+                    Main.log.info("PUT Method Detected");    
                     try {                           
                         AgentMethodHandler.handleMethodPUT(request,response);
                     } catch (Exception ex) {
-                        Agent.log.error("Exception handleMethodPUT "+ex.getMessage());
+                        Main.log.error("Exception handleMethodPUT "+ex.getMessage());
                         ex.printStackTrace();
                     }  
                     break;
                 default: 
-                    Agent.log.error("Unsupported method");
+                    Main.log.error("Unsupported method");
                     return;
             }
        }    
@@ -165,13 +165,13 @@ public class AgentHttpService {
         }
         
         public void run() {
-            Agent.log.info("Listening on port " + this.serversocket.getLocalPort());
+            Main.log.info("Listening on port " + this.serversocket.getLocalPort());
             while (!Thread.interrupted()) {
                 try {
                     // Set up HTTP connection
                     Socket socket = this.serversocket.accept();
                     DefaultHttpServerConnection conn = new DefaultHttpServerConnection();
-                    Agent.log.info("Incoming connection from " + socket.getInetAddress());
+                    Main.log.info("Incoming connection from " + socket.getInetAddress());
                     conn.bind(socket, this.params);
 
                     // Start worker thread
@@ -181,7 +181,7 @@ public class AgentHttpService {
                 } catch (InterruptedIOException ex) {
                     break;
                 } catch (IOException e) {
-                    Agent.log.error("I/O error initialising connection thread: " 
+                    Main.log.error("I/O error initialising connection thread: " 
                             + e.getMessage());
                     break;
                 }
@@ -203,19 +203,19 @@ public class AgentHttpService {
         }
         
         public void run() {
-            Agent.log.info("New connection thread");
+            Main.log.info("New connection thread");
             HttpContext context = new BasicHttpContext(null);
             try {
                 while (!Thread.interrupted() && this.conn.isOpen()) {
                     this.httpservice.handleRequest(this.conn, context);
                 }
             } catch (ConnectionClosedException ex) {
-                Agent.log.info("Client closed connection");
+                Main.log.info("Client closed connection");
             } catch (IOException ex) {
-                Agent.log.error("I/O error: " + ex.getMessage());
+                Main.log.error("I/O error: " + ex.getMessage());
                 ex.printStackTrace();
             } catch (HttpException ex) {
-                Agent.log.error("Unrecoverable HTTP protocol violation: " + ex.getMessage());
+                Main.log.error("Unrecoverable HTTP protocol violation: " + ex.getMessage());
             } finally {
                 try {
                     this.conn.shutdown();

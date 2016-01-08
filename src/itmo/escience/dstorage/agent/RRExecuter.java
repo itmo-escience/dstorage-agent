@@ -40,11 +40,11 @@ public class RRExecuter implements Runnable {
     private void returnStatus(JSONObject jsonStatus){
         try{
             jsonStatus.put("action", "ack");
-            jsonStatus.put("agent_ipaddress", Agent.getAgentAddress());
-            jsonStatus.put("agent_port", Agent.getConfig().getProperty("AgentPort"));
+            jsonStatus.put("agent_ipaddress", Main.getAgentAddress());
+            jsonStatus.put("agent_port", Main.getConfig().getProperty("AgentPort"));
             HttpConn httpconn = new HttpConn();
-        //Agent.getConfig().getProperty("StorageCoreAddress"),Integer.valueOf(Agent.getConfig().getProperty("StorageCorePort"))
-            httpconn.setup(Agent.getConfig().getProperty("StorageCoreAddress"),Agent.getConfig().getProperty("StorageCorePort"));     
+        //Agent.getConfig().getProperty("StorageCoreAddress"),Integer.valueOf(Main.getConfig().getProperty("StorageCorePort"))
+            httpconn.setup(Main.getConfig().getProperty("StorageCoreAddress"),Main.getConfig().getProperty("StorageCorePort"));     
             httpconn.setMethod("PUT","/agent");
             httpconn.setEntity(jsonStatus);
             httpconn.connect();
@@ -93,7 +93,7 @@ public class RRExecuter implements Runnable {
                                     AgentSystem.isGet);
                             break;
                         default:
-                            Agent.log.error("Unsupported command name");
+                            Main.log.error("Unsupported command name");
                             jsonStatus=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR, "Bad request");    
                     }                                     
                     break;
@@ -116,7 +116,7 @@ public class RRExecuter implements Runnable {
                                     AgentSystem.isGet);
                             break;
                         default:
-                            Agent.log.error("Unsupported command name");
+                            Main.log.error("Unsupported command name");
                             jsonStatus=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR, "Bad request");                              
                     }
                     break;
@@ -140,7 +140,7 @@ public class RRExecuter implements Runnable {
                                     AgentSystem.isGet,!AgentSystem.isSecure);
                             break;
                         default:
-                            Agent.log.error("Unsupported command name");
+                            Main.log.error("Unsupported command name");
                             jsonStatus=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR, "Bad request");                           
                     }
                     break;
@@ -163,12 +163,12 @@ public class RRExecuter implements Runnable {
                                     AgentSystem.isGet,AgentSystem.isSecure);
                             break;
                         default:
-                            Agent.log.error("Unsupported command name");
+                            Main.log.error("Unsupported command name");
                             jsonStatus=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR, "Bad request");                          
                     }
                     break;
                 default:
-                    Agent.log.error("Unsupported command type");
+                    Main.log.error("Unsupported command type");
                     jsonStatus=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR, "Bad request");
         }//end switch
         //callback to storage
@@ -180,11 +180,11 @@ public class RRExecuter implements Runnable {
         else this.jStatus=jsonStatus;
         /*
         jsonStatus.put("action", "ack");
-        jsonStatus.put("agent_ipaddress", Agent.getAgentAddress());
-        jsonStatus.put("agent_port", Agent.getConfig().getProperty("AgentPort"));
+        jsonStatus.put("agent_ipaddress", Main.getAgentAddress());
+        jsonStatus.put("agent_port", Main.getConfig().getProperty("AgentPort"));
         HttpConn httpconn = new HttpConn();
-        //Agent.getConfig().getProperty("StorageCoreAddress"),Integer.valueOf(Agent.getConfig().getProperty("StorageCorePort"))
-        httpconn.setup(Agent.getConfig().getProperty("StorageCoreAddress"),Agent.getConfig().getProperty("StorageCorePort"));     
+        //Agent.getConfig().getProperty("StorageCoreAddress"),Integer.valueOf(Main.getConfig().getProperty("StorageCorePort"))
+        httpconn.setup(Main.getConfig().getProperty("StorageCoreAddress"),Main.getConfig().getProperty("StorageCorePort"));     
         httpconn.setMethod("PUT","/agent");
         httpconn.setEntity(jsonStatus);
         httpconn.connect();

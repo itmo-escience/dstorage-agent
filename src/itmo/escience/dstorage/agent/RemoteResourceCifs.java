@@ -34,7 +34,7 @@ public class RemoteResourceCifs {
             if(isGet){
                 final SmbFile smb = new SmbFile(getSmbpath()+strRemoteFileName,auth);      
                 InputStream in = new SmbFileInputStream(smb);
-                OutputStream outFile = new FileOutputStream(Agent.getAgentDocRoot().getPath() +File.separatorChar+ strLocalFileName);
+                OutputStream outFile = new FileOutputStream(Main.getAgentDocRoot().getPath() +File.separatorChar+ strLocalFileName);
                 int intBytesRead=0;
                 byte[] bytes = new byte[4096];
                 while ((intBytesRead=in.read(bytes))!=-1)
@@ -45,7 +45,7 @@ public class RemoteResourceCifs {
             else {
                 final SmbFile smb = new SmbFile(getSmbpath()+strRemoteFileName,auth);
                 SmbFileOutputStream smbfos = new SmbFileOutputStream(smb);
-                InputStream inFile = new FileInputStream(Agent.getAgentDocRoot().getPath() +File.separatorChar+ strLocalFileName);           
+                InputStream inFile = new FileInputStream(Main.getAgentDocRoot().getPath() +File.separatorChar+ strLocalFileName);           
                 int intBytesRead=0;
                 byte[] bytes = new byte[4096];
                 while ((intBytesRead=inFile.read(bytes))!=-1)
@@ -54,7 +54,7 @@ public class RemoteResourceCifs {
                 inFile.close();
             }
         } catch (SmbException e){
-            Agent.log.info("Error while copy file "+strLocalFileName+" with CIFS remote resource " + addr);
+            Main.log.info("Error while copy file "+strLocalFileName+" with CIFS remote resource " + addr);
             return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,"Error while copy file. "+e.getLocalizedMessage());
         }
         jsonstatus.put("status", AgentSystem.STATUS_OK);
@@ -90,7 +90,7 @@ public class RemoteResourceCifs {
         try {
             smbfiles = smb.listFiles();
         } catch (SmbException e){
-            Agent.log.info("Error in retrieve list of directory " + path);
+            Main.log.info("Error in retrieve list of directory " + path);
             return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,"Error while list dir. "+e.getLocalizedMessage());
         }            
         for(int i = 0; i < smbfiles.length; i++)

@@ -23,11 +23,11 @@ public class AgentSystem {
         // Получение количества свободного места с учетом квоты и места в разделе
         Long lgCurrentQuota;
         // Место в разделе
-        Long lgFreeDiskSpace= Agent.getAgentDocRoot().getFreeSpace();
+        Long lgFreeDiskSpace= Main.getAgentDocRoot().getFreeSpace();
         // Квота в конфигурационном файле
         //Long lgQuota=Long.valueOf(strQuota);
         // Размер директории для хранения файлов                
-        lgCurrentQuota=Long.valueOf(Agent.getQuota())-getDocRootSize(Agent.getAgentDocRoot());
+        lgCurrentQuota=Long.valueOf(Main.getQuota())-getDocRootSize(Main.getAgentDocRoot());
         //Другие процессы занимают место в разделе под файлы
         if (lgCurrentQuota.compareTo(lgFreeDiskSpace)>0)
             lgCurrentQuota=lgFreeDiskSpace;
@@ -41,11 +41,11 @@ public class AgentSystem {
         // Получение количества свободного места с учетом квоты и места в разделе
         Long lgCurrentQuota;
         // Место в разделе
-        Long lgFreeDiskSpace= (new File (Agent.agentSsdDocRoot)).getFreeSpace();
+        Long lgFreeDiskSpace= (new File (Main.agentSsdDocRoot)).getFreeSpace();
         // Квота в конфигурационном файле
         //Long lgQuota=Long.valueOf(strQuota);
         // Размер директории для хранения файлов                
-        lgCurrentQuota=Long.valueOf(Agent.getSsdQuota())-getDocRootSize(new File(Agent.agentSsdDocRoot));
+        lgCurrentQuota=Long.valueOf(Main.getSsdQuota())-getDocRootSize(new File(Main.agentSsdDocRoot));
         //Другие процессы занимают место в разделе под файлы
         if (lgCurrentQuota.compareTo(lgFreeDiskSpace)>0)
             lgCurrentQuota=lgFreeDiskSpace;
@@ -70,11 +70,11 @@ public class AgentSystem {
              jsonObject = (JSONObject)jsonParser.parse(obj);
          } 
          catch (ParseException ex) {
-            Agent.log.error("JSON Parse Error. Object:"+ex.getUnexpectedObject()+"; Position:"+ex.getPosition());
+            Main.log.error("JSON Parse Error. Object:"+ex.getUnexpectedObject()+"; Position:"+ex.getPosition());
             return jsonObject; 
          }
          catch (Exception ex) {                  
-            Agent.log.error("JSON Exception:"+ex.getMessage());
+            Main.log.error("JSON Exception:"+ex.getMessage());
             return jsonObject; 
          }          
         return jsonObject;

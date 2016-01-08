@@ -28,7 +28,7 @@ public class MRTimeStat {
                 case t6: this.t6=time;break;
                 case t7: this.t7=time;break;
                 case t8: this.t8=time;break;
-                default: Agent.log.error("TimeMarker type not Found");            
+                default: Main.log.error("TimeMarker type not Found");            
         }
     }
     public JSONObject toJSON(){
@@ -51,8 +51,8 @@ public class MRTimeStat {
             markers.put("t3","-1");        
         */
         json.put("action", "ack");
-        json.put("agent_ipaddress", Agent.getAgentAddress());
-        json.put("agent_port", Agent.getConfig().getProperty("AgentPort"));  
+        json.put("agent_ipaddress", Main.getAgentAddress());
+        json.put("agent_port", Main.getConfig().getProperty("AgentPort"));  
         //Agent.log.info("markers="+markers.toString());
         json.put("stat", markers);
         return json;

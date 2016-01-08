@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.handlers;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.Network;
 import itmo.escience.dstorage.agent.StorageLayer;
 import itmo.escience.dstorage.agent.Ticket;
@@ -39,18 +39,18 @@ public class LvlMgmtHandler implements Runnable {
         coreResponse=new CoreAckResponse();
     }
     private long lvlCopy(String filename,StorageLevel from,StorageLevel to){
-        StorageLayer layer=Agent.getStorageLayer(); 
+        StorageLayer layer=Main.getStorageLayer(); 
         InputStream is=layer.getFileAsStream(from, filename);
         if(is==null )return 0;
         return layer.addFile(to, is, filename);
     }
     private long lvlDelete(String filename,StorageLevel from){
-        StorageLayer layer=Agent.getStorageLayer(); 
+        StorageLayer layer=Main.getStorageLayer(); 
         long size=layer.getFileLen(from, filename);
         return layer.deleteFileFromLevel(from,filename)? 0 : size;
     }
     private long lvlMove(String filename,StorageLevel from,StorageLevel to){
-        StorageLayer layer=Agent.getStorageLayer(); 
+        StorageLayer layer=Main.getStorageLayer(); 
         InputStream is=layer.getFileAsStream(from, filename);
         if(is==null )return 0;
         //copy
@@ -66,7 +66,7 @@ public class LvlMgmtHandler implements Runnable {
 
     @Override
     public void run() {
-        StorageLayer layer=Agent.getStorageLayer();                       
+        StorageLayer layer=Main.getStorageLayer();                       
         String filename=request.getParam(AgentCommandParam.ID.name());
         //check that file is located on apropriate level        
         long status=0;

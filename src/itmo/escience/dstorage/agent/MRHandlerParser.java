@@ -63,7 +63,7 @@ public class MRHandlerParser {
         this.method=met.getMethodName();
         this.serializatorName=serializatorName;    
         this.file=file;
-        this.currentPath=Agent.fAgentDocRoot.getPath()+File.separator;  
+        this.currentPath=Main.fAgentDocRoot.getPath()+File.separator;  
         this.defReq=met;
 
     }
@@ -79,22 +79,22 @@ public class MRHandlerParser {
             /*
             for(Method mm:cl.getMethods()){
                 if(mm.getName().equals(MRMethodName.ProcessFile.toString())) {
-                    Agent.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" found");
+                    Main.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" found");
                     Class<?>[] cc=mm.getParameterTypes();
                     //check amount should be 3
-                    if(cc.length!=3) {Agent.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has not exactly 3 parameters "+"(now "+cc.length+")");return false;}
+                    if(cc.length!=3) {Main.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has not exactly 3 parameters "+"(now "+cc.length+")");return false;}
                     //first element 
-                    if(!cc[0].equals(java.io.InputStream.class)) {Agent.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has 1 parameter different from "+java.io.InputStream.class.getName());return false;}
-                    if(!cc[1].equals(java.lang.String.class)) {Agent.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has 2 parameter different from "+java.lang.String.class.getName());return false;}
-                    if(!cc[2].equals(java.lang.String.class)) {Agent.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has 3 parameter different from "+java.lang.String.class.getName());return false;}
+                    if(!cc[0].equals(java.io.InputStream.class)) {Main.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has 1 parameter different from "+java.io.InputStream.class.getName());return false;}
+                    if(!cc[1].equals(java.lang.String.class)) {Main.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has 2 parameter different from "+java.lang.String.class.getName());return false;}
+                    if(!cc[2].equals(java.lang.String.class)) {Main.log.info("Jar parse:Method "+MRMethodName.ProcessFile+" has 3 parameter different from "+java.lang.String.class.getName());return false;}
                 }
                 else return false;
                 //Check signature of JoinResult Method
                 if(mm.getName().equals(MRMethodName.JoinResults.toString())) {
-                    Agent.log.info("Jar parse:Method "+MRMethodName.JoinResults+" found");
+                    Main.log.info("Jar parse:Method "+MRMethodName.JoinResults+" found");
                     Class<?>[] cc=mm.getParameterTypes();
-                    if(cc.length!=1) {Agent.log.info("Jar parse:Method "+MRMethodName.JoinResults+" should have 1 parameter "+"(now "+cc.length+")");return false;}
-                    if(!cc[0].equals(java.lang.String.class)) {Agent.log.info("Jar parse:Method "+
+                    if(cc.length!=1) {Main.log.info("Jar parse:Method "+MRMethodName.JoinResults+" should have 1 parameter "+"(now "+cc.length+")");return false;}
+                    if(!cc[0].equals(java.lang.String.class)) {Main.log.info("Jar parse:Method "+
                             MRMethodName.JoinResults+" has parameter different from "+java.lang.Object[].class.getName());return false;}                    
                 }
                 else return false;
@@ -109,13 +109,13 @@ public class MRHandlerParser {
             m=cl.getMethod(method,defReq.getMethodParameters());
             if (!isStdType(m.getReturnType())){
                 /*
-                Agent.log.info("Find Custom type return value "+ m.getReturnType().getCanonicalName());
+                Main.log.info("Find Custom type return value "+ m.getReturnType().getCanonicalName());
                 //Check that custom type exist in jar
                 boolean found=false;
                 for(Class<?> allcl:cl.getClasses()){
                     if(allcl.getName().equals(m.getReturnType()))found=true;
                 }
-                if(!found){Agent.log.info("Jar parse:Inner class "+m.getReturnType().getName()+" not found");return false;}
+                if(!found){Main.log.info("Jar parse:Inner class "+m.getReturnType().getName()+" not found");return false;}
                 */
                 Class<?> incl = Class.forName (m.getReturnType().getName(), true, loader);
                 //for(Class<?> c: cl.getClasses() ){
@@ -137,14 +137,14 @@ public class MRHandlerParser {
             }
             this.printProto();
         } catch (MalformedURLException ex) {
-            Agent.log.error(MRHandlerParser.class.getName()+" . MalformedURLException "+ex);
+            Main.log.error(MRHandlerParser.class.getName()+" . MalformedURLException "+ex);
             return false;
         } catch (ClassNotFoundException ex) {
-            Agent.log.error(MRHandlerParser.class.getName()+" . ClassNotFoundException "+ex);
+            Main.log.error(MRHandlerParser.class.getName()+" . ClassNotFoundException "+ex);
             return false;
         } catch (NoSuchMethodException ex) {
             ex.printStackTrace();
-            Agent.log.error(MRHandlerParser.class.getName()+" . NoSuchMethodException "+ex);
+            Main.log.error(MRHandlerParser.class.getName()+" . NoSuchMethodException "+ex);
             return false;
         } catch (IOException ex) {
             Logger.getLogger(MRHandlerParser.class.getName()).log(Level.SEVERE, null, ex);
@@ -164,9 +164,9 @@ public class MRHandlerParser {
         this.javaproto.put(name,type);
     }
     private void printProto() throws IOException{
-        Agent.log.info("Proto file:");
+        Main.log.info("Proto file:");
         for(Map.Entry<String,ProtoType> m:this.proto.entrySet()){
-            Agent.log.info(m.getKey()+" "+m.getValue());
+            Main.log.info(m.getKey()+" "+m.getValue());
         }
     }
     private ProtoType getValueType(Class<?> cl){
@@ -215,7 +215,7 @@ public class MRHandlerParser {
         if(!(new File(currentPath+"src")).exists())
             new File(currentPath+"src").mkdir();
         List<String> cmdProto = new ArrayList<String>();
-        cmdProto.add(Agent.getProtocPath());
+        cmdProto.add(Main.getProtocPath());
         cmdProto.add("--java_out="+currentPath+File.separator+"src");
         cmdProto.add("--proto_path="+currentPath);
         cmdProto.add(protoFileName);        
@@ -224,16 +224,16 @@ public class MRHandlerParser {
         pProtoc.destroy();
     }
     public void generateSrc() throws IOException{
-        Agent.log.info(currentPath+"src"+File.separator+"agent");
+        Main.log.info(currentPath+"src"+File.separator+"agent");
         if(!(new File(currentPath+"src"+File.separator+"agent")).exists())
             new File(currentPath+"src"+File.separator+"agent").mkdir();
             //Agent.log.info("Not exist");
-        if((new File(currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java")).exists()) {Agent.log.info( "Generate Src: File "+
+        if((new File(currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java")).exists()) {Main.log.info( "Generate Src: File "+
                 currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java"+" already exist");
             //delete them
-            if(!(new File(currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java")).delete());Agent.log.info("Delete file MRSerializator.java");}
+            if(!(new File(currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java")).delete());Main.log.info("Delete file MRSerializator.java");}
         PrintWriter pwriter = new PrintWriter(new BufferedWriter(new FileWriter(currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java", true)));        
-        Agent.log.info(currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java");
+        Main.log.info(currentPath+"src"+File.separator+"agent"+File.separator+"MRSerializator.java");
         pwriter.println("package "+PACKAGE_NAME+";");
         pwriter.println("import bigdata.AvgResult.*;");
         //if (stdType!=null)pwriter.println("import bigdata."+this.innerClass+";");
@@ -318,7 +318,7 @@ public class MRHandlerParser {
     
     public void generateSerializator() throws IOException, InterruptedException{                   
         List<String> cmd = new ArrayList<String>();
-        cmd.add(Agent.getJavacPath());
+        cmd.add(Main.getJavacPath());
         cmd.add("-cp");
         cmd.add(currentPath+File.separator+"lib/protobuf-java-2.5.0.jar;"+currentPath+File.separator+file);
         //cmd.add("-sourcepath");
@@ -328,20 +328,20 @@ public class MRHandlerParser {
         Process pJavac = null;
         //File filepath=null;
         //filepath=new File(currentPath);
-        Agent.log.info("Cmd Serializator compile: "+cmd.toString());
+        Main.log.info("Cmd Serializator compile: "+cmd.toString());
         ProcessBuilder pbuilder=new ProcessBuilder(cmd);//.directory(new File(currentPath));
         //pbuilder.directory(filepath);        
         pJavac=pbuilder.start();
         //pJavac.directory("/home");        
         pJavac.waitFor();
-        if(pJavac.exitValue()!=0)Agent.log.error("Compile Serializator:Error while execute command "+cmd.toString());
-        else Agent.log.info("Success of compile Serializator: "+cmd.toString()+" exit value "+pJavac.exitValue());
+        if(pJavac.exitValue()!=0)Main.log.error("Compile Serializator:Error while execute command "+cmd.toString());
+        else Main.log.info("Success of compile Serializator: "+cmd.toString()+" exit value "+pJavac.exitValue());
         //Thread.sleep(10000);
         //pJavac.destroy();        
         //"c:\\program files\\java\\jdk1.6.0_45\\bin\\jar.exe" cvf ../jar.jar agent/*.class
         List<String> cmdJar = new ArrayList<String>();
         //cmdJar.add("cd "+currentPath+File.separator+"src"+";");
-        cmdJar.add(Agent.getJarPath());
+        cmdJar.add(Main.getJarPath());
         cmdJar.add("cf");
         cmdJar.add(currentPath+File.separator+file+"-"+serializatorName+".jar");
         //cmdJar.add("../"+file+"-"+serializatorName+".jar");
@@ -350,13 +350,13 @@ public class MRHandlerParser {
         cmdJar.add("agent");
         //cmdJar.add("agent/*.class");
         //File filepath2=new File(currentPath+File.separator+"src");
-        Agent.log.info("Cmd Serializator build: "+cmdJar.toString());
+        Main.log.info("Cmd Serializator build: "+cmdJar.toString());
         ProcessBuilder pJarbldr=(new ProcessBuilder(cmdJar));//.directory(new File(currentPath+File.separator+"src"));
         //pJarbldr.directory(filepath2);
         Process pJar=pJarbldr.start();        
         pJar.waitFor();
-        if(pJar.exitValue()!=0)Agent.log.error("Build Serializator:Error while execute command "+cmd.toString());
-        else Agent.log.info("Success of build Serializator: "+cmdJar.toString()+" exit value "+pJar.exitValue());
+        if(pJar.exitValue()!=0)Main.log.error("Build Serializator:Error while execute command "+cmd.toString());
+        else Main.log.info("Success of build Serializator: "+cmdJar.toString()+" exit value "+pJar.exitValue());
         //TODO check that del is ok        
         //pJar.destroy();                
         

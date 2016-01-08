@@ -40,31 +40,31 @@ public class Commands {
             HttpResponse response) throws Exception {
         JSONObject jsonRequest= new JSONObject();
         String target = request.getRequestLine().getUri();
-        Agent.log.info("URLDecoder = "+target);
+        Main.log.info("URLDecoder = "+target);
         String[] strOption;
         strOption=target.split("[/]");      
-        Agent.log.info("action "+(strOption[2].split(":"))[1]);
-        Agent.log.info("agent_address "+(strOption[3].split(":"))[1]);
-        Agent.log.info("agent_port "+(strOption[4].split(":"))[1]);
-        Agent.log.info("file_id "+(strOption[5].split(":"))[1]); 
+        Main.log.info("action "+(strOption[2].split(":"))[1]);
+        Main.log.info("agent_address "+(strOption[3].split(":"))[1]);
+        Main.log.info("agent_port "+(strOption[4].split(":"))[1]);
+        Main.log.info("file_id "+(strOption[5].split(":"))[1]); 
         if ((strOption[2].split(":"))[1].equals("get"))
             {
             try {
-                if ((Agent.getConfig().isProperty("Security"))){
-                    if (Agent.getConfig().getProperty("Security").equals("2")){
+                if ((Main.getConfig().isProperty("Security"))){
+                    if (Main.getConfig().getProperty("Security").equals("2")){
                         if (!Ticket.validateStorageTicket(request)) return;
                         jsonRequest.put("Ticket",request.getFirstHeader("Ticket").getValue());
                         jsonRequest.put("Sign",request.getFirstHeader("Sign").getValue());                    
                     }
                 }                                          
                 URL urlAgent= new URL ("http://"+(strOption[3].split(":"))[1]+":"+((strOption[4].split(":"))[1]));
-                Agent.log.info("URL "+urlAgent.toString());
+                Main.log.info("URL "+urlAgent.toString());
                 Network.doGetFileFromAgent(strOption[5].split(":")[1], urlAgent, jsonRequest);
                 JSONObject jsonStatus = new JSONObject();
                 jsonStatus.put("status", STATUS_OK);
                 jsonStatus.put("msg", "Command completed");
                 response.setStatusCode(HttpStatus.SC_OK);
-                Agent.log.info(jsonStatus.toString());                        
+                Main.log.info(jsonStatus.toString());                        
                 StringEntity strEntRequest = new StringEntity (jsonStatus.toString());
                 strEntRequest.setContentType("application/json");     
                 response.setEntity(strEntRequest);         
@@ -74,15 +74,15 @@ public class Commands {
                 jsonStatus.put("status", STATUS_ERROR);
                 jsonStatus.put("msg", "Invalid command");
                 response.setStatusCode(HttpStatus.SC_OK);
-                Agent.log.info(jsonStatus.toString());                        
+                Main.log.info(jsonStatus.toString());                        
                 StringEntity strEntRequest = new StringEntity (jsonStatus.toString());
                 strEntRequest.setContentType("application/json");     
                 response.setEntity(strEntRequest);
-                Agent.log.info(e.getLocalizedMessage());
+                Main.log.info(e.getLocalizedMessage());
                 return;
             }       
         } else {
-            Agent.log.info("Unsupported action in command : "+target);
+            Main.log.info("Unsupported action in command : "+target);
             return;
         } 
 }
@@ -94,8 +94,8 @@ public class Commands {
         //Agent.log.info("zipArchive = " + jsonPutRequest);
         jsonList=(JSONObject)jsonPutRequest.get("list");
         //Agent.log.info("zipArchive List = " + jsonList);
-        String zipfile=Agent.getAgentDocRoot().getPath() + File.separatorChar+jsonPutRequest.get("archive").toString();
-        String rootDir=Agent.getAgentDocRoot().getPath() + File.separatorChar;
+        String zipfile=Main.getAgentDocRoot().getPath() + File.separatorChar+jsonPutRequest.get("archive").toString();
+        String rootDir=Main.getAgentDocRoot().getPath() + File.separatorChar;
         //Agent.log.info("rootDir = " + rootDir);
         //Agent.log.info("zipfile = " + zipfile);
         //check that files and zipfile exist
@@ -110,7 +110,7 @@ public class Commands {
             //omit emty dirs
             if (entry.getKey().equals("dirEntry")) continue;
             if(!(new File(rootDir+entry.getKey().toString())).exists()){
-                Agent.log.info("filename = " + entry.getKey().toString());
+                Main.log.info("filename = " + entry.getKey().toString());
                 jsonStatus.put("msg", "At least one archived file doesn't exist");
                 jsonStatus.put("status", AgentSystem.STATUS_ERROR);
                 return jsonStatus;
@@ -119,7 +119,7 @@ public class Commands {
             /*
         for (int i=0;i<jsonList.size();i++){
             if(!(new File(rootDir+((JSONObject)jsonList.get(i)).get("file").toString())).exists()){
-                Agent.log.info("filename = " + ((JSONObject)jsonList.get(i)).get("file"));
+                Main.log.info("filename = " + ((JSONObject)jsonList.get(i)).get("file"));
                 jsonStatus.put("msg", "At least one archived files doesn't exist");
                 jsonStatus.put("status", AgentSystem.STATUS_ERROR);
                 return jsonStatus;
@@ -130,7 +130,7 @@ public class Commands {
         th.start();
         jsonStatus.put("msg", "Command to zip was accepted");
         jsonStatus.put("status", AgentSystem.STATUS_OK);
-        Agent.log.info("jsonStatus="+jsonStatus.toString());
+        Main.log.info("jsonStatus="+jsonStatus.toString());
         return jsonStatus;
         /*
         try {
@@ -153,11 +153,11 @@ public class Commands {
          zipOutStream.flush(); 
          zipOutStream.close(); 
          } catch (FileNotFoundException fx) {
-            Agent.log.error("FileNotFoundException :"+fx.getLocalizedMessage());
+            Main.log.error("FileNotFoundException :"+fx.getLocalizedMessage());
             jsonStatus.put("msg", "ZipArchive. File not found");
             jsonStatus.put("status", AgentSystem.STATUS_ERROR);
          } catch (IOException ioex) {                  
-            Agent.log.error("IOexception:"+ioex.getMessage());
+            Main.log.error("IOexception:"+ioex.getMessage());
             jsonStatus.put("msg", "Input-Output Error");
             jsonStatus.put("status", AgentSystem.STATUS_ERROR);
          }   
@@ -172,9 +172,9 @@ public class Commands {
         return jsonStatus;
     }       
     public static JSONObject mapReduce(RequestMapReduce request) throws IOException, InterruptedException, Exception{
-        //PrintWriter pwriter2 = new PrintWriter(new BufferedWriter(new FileWriter("MapLogAv_"+Agent.getAgentAddress()+".log", true)));
-        //PrintWriter pwriterReduce = new PrintWriter(new BufferedWriter(new FileWriter("MapLogReduce_"+Agent.getAgentAddress()+".log", true)));
-        //PrintWriter pwriterLeader = new PrintWriter(new BufferedWriter(new FileWriter("MapLogLeader_"+Agent.getAgentAddress()+".log", true)));
+        //PrintWriter pwriter2 = new PrintWriter(new BufferedWriter(new FileWriter("MapLogAv_"+Main.getAgentAddress()+".log", true)));
+        //PrintWriter pwriterReduce = new PrintWriter(new BufferedWriter(new FileWriter("MapLogReduce_"+Main.getAgentAddress()+".log", true)));
+        //PrintWriter pwriterLeader = new PrintWriter(new BufferedWriter(new FileWriter("MapLogLeader_"+Main.getAgentAddress()+".log", true)));
         
         //RequestMapReduce request  = new RequestMapReduce(jsonMapReduce.toString());
         switch (request.type) {
@@ -192,7 +192,7 @@ public class Commands {
                 ///////////////////////
                 //pf.run();    
                 //WRONG METHOD
-                Agent.getMapReduceStat().addStat(new MapTotalStat(new Date(),Agent.getAgentAddress(),((new Date().getTime())-runTime),request.task_id));
+                Main.getMapReduceStat().addStat(new MapTotalStat(new Date(),Main.getAgentAddress(),((new Date().getTime())-runTime),request.task_id));
                 Process pFlush=Runtime.getRuntime().exec("cmd /c \"C:/temp/EmptyStandbyList.exe\"");
                 //Thread.sleep(1000);
                 //Perf.IOActivity();
@@ -200,64 +200,64 @@ public class Commands {
                 //Perf.IOSpeed();        
                 break;
             case REDUCE:
-                Agent.log.info("Start reduce!!!");
+                Main.log.info("Start reduce!!!");
                 //Agent.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t3);
                 long runTimeReduce=new Date().getTime();
                 //Object[] aobj;
-                Agent.getReduceQueue(request.sessionID).add(request);
+                Main.getReduceQueue(request.sessionID).add(request);
                     //int count=0;
                     //for (int n=0;n<Agent.getAgentReduceQueue().size();n++){
-                    //    if (request.sessionID.equals(Agent.getAgentReduceQueue().get(n).sessionID))
+                    //    if (request.sessionID.equals(Main.getAgentReduceQueue().get(n).sessionID))
                     //        count++;
-                    if(request.count==Agent.getReduceQueue(request.sessionID).size()) {
+                    if(request.count==Main.getReduceQueue(request.sessionID).size()) {
                         //start reduce
                         Reduce reduce=new Reduce(request);
                         //aobj=new Object[count]; 
                         //int z=0;
                         /*
                         for (int i=0;i<Agent.getAgentReduceQueue().size();i++){
-                            if (Agent.getAgentReduceQueue().get(i).sessionID.equals(request.sessionID)){
+                            if (Main.getAgentReduceQueue().get(i).sessionID.equals(request.sessionID)){
                                 System.out.println("Add data N="+i);
-                                reduce.addObject(Agent.getAgentReduceQueue().get(i).data);
+                                reduce.addObject(Main.getAgentReduceQueue().get(i).data);
                             }                         
                         }
                         */
-                        for(RequestMapReduce rmr:Agent.getReduceQueue(request.sessionID))reduce.addObject(rmr.data);
-                        Agent.getReduceQueue(request.sessionID).clear();
-                        Agent.delFromReduceQueue(request.sessionID);
+                        for(RequestMapReduce rmr:Main.getReduceQueue(request.sessionID))reduce.addObject(rmr.data);
+                        Main.getReduceQueue(request.sessionID).clear();
+                        Main.delFromReduceQueue(request.sessionID);
                         Thread thr=new Thread(reduce);
                         thr.start();
                         //reduce.start();                        
                         //Agent.getAgentReduceQueue().clear();
-                        //Agent.getMapReduceStat().addStat(new ReduceStat(new Date(),Agent.getAgentAddress(),((new Date().getTime())-runTimeReduce),request.task_id));
-                        Agent.getMapReduceStat().addStat(new ReduceStat(new Date(),Agent.getAgentAddress(),((new Date().getTime())-runTimeReduce),request.task_id));
+                        //Agent.getMapReduceStat().addStat(new ReduceStat(new Date(),Main.getAgentAddress(),((new Date().getTime())-runTimeReduce),request.task_id));
+                        Main.getMapReduceStat().addStat(new ReduceStat(new Date(),Main.getAgentAddress(),((new Date().getTime())-runTimeReduce),request.task_id));
                         //sent mrtimestat to core
-                        if (!(request.leaderURI.split(":")[0].equals(Agent.getAgentAddress())&& request.leaderURI.split(":")[1].equals(Agent.getAgentPort())) )
-                            Agent.getMapReduceStat().sendMrTimeStat(Agent.getConfig().getProperty("StorageCoreAddress"),Agent.getConfig().getProperty("StorageCorePort"), reduce.request.task_id);
+                        if (!(request.leaderURI.split(":")[0].equals(Main.getAgentAddress())&& request.leaderURI.split(":")[1].equals(Main.getAgentPort())) )
+                            Main.getMapReduceStat().sendMrTimeStat(Main.getConfig().getProperty("StorageCoreAddress"),Main.getConfig().getProperty("StorageCorePort"), reduce.request.task_id);
                         break;
                          }                    
                         
                 //Agent.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t6);
                         
-                //pwriterReduce.append("reduce "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()))+" "+Agent.getAgentAddress()+" "+request.sessionID+" "+request.count+" "+Long.toString((new Date().getTime())-runTimeReduce));
+                //pwriterReduce.append("reduce "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()))+" "+Main.getAgentAddress()+" "+request.sessionID+" "+request.count+" "+Long.toString((new Date().getTime())-runTimeReduce));
                 //pwriterReduce.println();
                     
                 break;
             case LEADER:
                 long runTimeLeader=new Date().getTime();
-                Agent.getLeaderQueue(request.task_id).add(request);
+                Main.getLeaderQueue(request.task_id).add(request);
                 //System.out.println("Start leader-reduce!!!");
-                Agent.log.info("LeaderReduceQueue="+Agent.getLeaderQueue(request.task_id).size());                                
+                Main.log.info("LeaderReduceQueue="+Main.getLeaderQueue(request.task_id).size());                                
                 //check that all agent return reduce results
                 /*int c=0;
                 for (int i=0;i<Agent.getLeaderReduceQueue().size();i++){
                     //calculate count of entry with the same agentList
-                    if (request.task_id.equals(Agent.getLeaderReduceQueue().get(i).task_id))
+                    if (request.task_id.equals(Main.getLeaderReduceQueue().get(i).task_id))
                         c++;
                     */
                     //check that agentCount the same as should be to finish reduce and return result to core
                     //if (c==100){
-                    if (request.agentCount==Agent.getLeaderQueue(request.task_id).size()){
+                    if (request.agentCount==Main.getLeaderQueue(request.task_id).size()){
                         //start reduce process on leader
                         Reduce reduce=new Reduce(request);
                         
@@ -266,37 +266,37 @@ public class Commands {
                         //join data from all agents
                         /*
                         for (int n=0;n<Agent.getLeaderReduceQueue().size();n++){
-                            if (Agent.getLeaderReduceQueue().get(n).task_id.equals(request.task_id)){
-                                reduce.addObject(Agent.getLeaderReduceQueue().get(i).data);
+                            if (Main.getLeaderReduceQueue().get(n).task_id.equals(request.task_id)){
+                                reduce.addObject(Main.getLeaderReduceQueue().get(i).data);
                                 
                             }
                         }
                         */
-                        for(RequestMapReduce rmr:Agent.getLeaderQueue(request.task_id)){
+                        for(RequestMapReduce rmr:Main.getLeaderQueue(request.task_id)){
                             reduce.addObject(rmr.data);
                         }        
                         reduce.run();                       
-                        Agent.getLeaderQueue(request.task_id).clear();
-                        Agent.delFromLeaderQueue(request.task_id);
-                        Agent.getMapReduceStat().addStat(new ReduceLeaderStat(new Date(),Agent.getAgentAddress(),((new Date().getTime())-runTimeLeader),request.task_id));
+                        Main.getLeaderQueue(request.task_id).clear();
+                        Main.delFromLeaderQueue(request.task_id);
+                        Main.getMapReduceStat().addStat(new ReduceLeaderStat(new Date(),Main.getAgentAddress(),((new Date().getTime())-runTimeLeader),request.task_id));
                         //sent mrtimestat to core
-                        Agent.getMapReduceStat().sendMrTimeStat(Agent.getConfig().getProperty("StorageCoreAddress"),Agent.getConfig().getProperty("StorageCorePort"), reduce.request.task_id);
+                        Main.getMapReduceStat().sendMrTimeStat(Main.getConfig().getProperty("StorageCoreAddress"),Main.getConfig().getProperty("StorageCorePort"), reduce.request.task_id);
                         
                         break;
                     }
                 //}
-                //pwriterLeader.append("leader "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()))+" "+Agent.getAgentAddress()+" "+request.sessionID+" "+request.count+" "+Long.toString((new Date().getTime())-runTimeLeader));
+                //pwriterLeader.append("leader "+(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(new Date()))+" "+Main.getAgentAddress()+" "+request.sessionID+" "+request.count+" "+Long.toString((new Date().getTime())-runTimeLeader));
                 //pwriterLeader.println();
                 //Thread.sleep(1000);
                 //Agent.getMapReduceStat().addMrTimeStat(request.task_id, new Date().getTime(), MRTimeStat.TimeMarker.t8);
                 
-                Agent.getMapReduceStat().writeStatToFiles();
+                Main.getMapReduceStat().writeStatToFiles();
                 break;
         }        
         JSONObject jsonStatus=new JSONObject();
         jsonStatus.put("msg", "Command to mapReduce was accepted");
         jsonStatus.put("status", AgentSystem.STATUS_OK);
-        Agent.log.info("jsonStatus="+jsonStatus.toString());
+        Main.log.info("jsonStatus="+jsonStatus.toString());
         return jsonStatus;
     }
    
@@ -382,7 +382,7 @@ public class Commands {
             }catch (Exception ex){
                 jsonStatus=AgentSystem.createMsgStatus(STATUS_ERROR, "Error while handle command "+ex.getLocalizedMessage());
             }
-            Agent.log.info("jsonStatus="+jsonStatus.toString());    
+            Main.log.info("jsonStatus="+jsonStatus.toString());    
             return jsonStatus;
         }
         else{

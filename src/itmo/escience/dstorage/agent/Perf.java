@@ -25,7 +25,7 @@ public class Perf{
         try{
             //
             //System.out.println("Ex= "+exQueue);
-            pwriter2 = new PrintWriter(new BufferedWriter(new FileWriter("IOQueue_"+Agent.getAgentAddress()+".log", true)));
+            pwriter2 = new PrintWriter(new BufferedWriter(new FileWriter("IOQueue_"+Main.getAgentAddress()+".log", true)));
             Process ps = Runtime.getRuntime().exec(exQueue);
             BufferedReader br= new BufferedReader(new InputStreamReader(ps.getInputStream()));
             while ((st=br.readLine())!=null){
@@ -44,7 +44,7 @@ public class Perf{
         PrintWriter pwriter=null;
         //typeperf -sc 1 "\Физический диск(_Total)\Скорость чтения с диска (байт/c)"
         String exSpeed = "typeperf -sc 1 \""+ "\\"+"Физический диск(_Total)"+"\\"+"Скорость чтения с диска (байт/с)\"";
-        pwriter = new PrintWriter(new BufferedWriter(new FileWriter("IOSpeed_"+Agent.getAgentAddress()+".log", true)));        
+        pwriter = new PrintWriter(new BufferedWriter(new FileWriter("IOSpeed_"+Main.getAgentAddress()+".log", true)));        
         try{
             //
             Process ps = Runtime.getRuntime().exec(exSpeed);
@@ -66,7 +66,7 @@ public class Perf{
         //typeperf -sc 1 "\Физический диск(_Total)\% активность диска"
         //typeperf "\Физический диск(_Total)\% активности диска при чтении"
         String exAct = "typeperf -sc 1 \""+ "\\"+"Физический диск(_Total)"+"\\"+"% активности диска при чтении\"";
-        pwriter = new PrintWriter(new BufferedWriter(new FileWriter("IOAct_"+Agent.getAgentAddress()+".log", true)));        
+        pwriter = new PrintWriter(new BufferedWriter(new FileWriter("IOAct_"+Main.getAgentAddress()+".log", true)));        
         try{
             //
             Process ps = Runtime.getRuntime().exec(exAct);

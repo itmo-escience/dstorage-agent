@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.responses;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.AgentSystem;
 import itmo.escience.dstorage.agent.utils.AgentCommand;
 import itmo.escience.dstorage.agent.utils.StorageLevel;
@@ -31,14 +31,14 @@ public class CoreAckResponse {
         json.put("action", "ack");
         json.put("file_size", Long.toString(size));
         json.put("id", filename);
-        json.put("ip", Agent.getAgentAddress());
+        json.put("ip", Main.getAgentAddress());
         if(cmd!=null)
             json.put("cmd", cmd.name());
         if(cmdid!=-1)
             json.put("cmdid", cmdid);
         if(lvl!=null)
             json.put("lvl", lvl.getNum());
-        json.put("port", Agent.getConfig().getProperty("AgentPort"));
+        json.put("port", Main.getConfig().getProperty("AgentPort"));
         return json;
     }
 }

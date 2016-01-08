@@ -49,9 +49,9 @@ public class RemoteResourceFtp {
         JSONObject jsonResult = new JSONObject();
         try {           
             ftpclient.connect(getAddr());
-            Agent.log.info("Connected to Ftp Remote Resource " + getAddr() + ".");
+            Main.log.info("Connected to Ftp Remote Resource " + getAddr() + ".");
             if(!FTPReply.isPositiveCompletion(ftpclient.getReplyCode())) {         
-                Agent.log.info("FTP server refused connection.");
+                Main.log.info("FTP server refused connection.");
                 jsonResult=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,ftpclient.getReplyString());
                 ftpclient.disconnect();
                 return jsonResult;
@@ -60,18 +60,18 @@ public class RemoteResourceFtp {
             //status 230 	User logged in, proceed. 
             //This status code appears after the client sends the correct password. It indicates that the user has successfully logged on. 
             if(ftpclient.getReplyCode()!=230) {                
-                Agent.log.info("FTP server doesn't accept username/password.");
+                Main.log.info("FTP server doesn't accept username/password.");
                 jsonResult=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,ftpclient.getReplyString());
                 ftpclient.disconnect();
                 return jsonResult;               
             }         
-            ftpclient.setControlEncoding(Agent.getLocalEncoding());
+            ftpclient.setControlEncoding(Main.getLocalEncoding());
             ftpclient.setFileType(FTP.BINARY_FILE_TYPE);
             //ftpclient.setFileTransferMode(FTP.BINARY_FILE_TYPE);
             ftpclient.enterLocalPassiveMode(); 
         } catch(IOException ioe) {
            //ioe.printStackTrace();
-           Agent.log.info("Error communicating with FTP Remote Resource " +getAddr());
+           Main.log.info("Error communicating with FTP Remote Resource " +getAddr());
            jsonResult=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,"Error communicate FTP Resource. "+ioe.getLocalizedMessage());
            ftpclient.disconnect();
         } 
@@ -102,14 +102,14 @@ public class RemoteResourceFtp {
                 return jsonResult;
             if(isGet){
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream
-                        (Agent.getAgentDocRoot().getPath()+File.separatorChar+strLocalFile));
+                        (Main.getAgentDocRoot().getPath()+File.separatorChar+strLocalFile));
                 ftpclient.retrieveFile(strRemoteFile,outputStream);
                 outputStream.close();
             }
             else {
                 //InputStream inStream = new BufferedInputStream(new FileInputStream
-                //        (Agent.getAgentDocRoot().getPath()+File.separatorChar+strLocalFile));
-                InputStream inFile = new FileInputStream(Agent.getAgentDocRoot().getPath()+File.separatorChar+strLocalFile);
+                //        (Main.getAgentDocRoot().getPath()+File.separatorChar+strLocalFile));
+                InputStream inFile = new FileInputStream(Main.getAgentDocRoot().getPath()+File.separatorChar+strLocalFile);
                 ftpclient.storeFile(strRemoteFile,inFile);
                 inFile.close();
             }          
@@ -121,7 +121,7 @@ public class RemoteResourceFtp {
             ftpclient.disconnect();
         } catch(IOException ioe) {
            ioe.printStackTrace();
-            Agent.log.info("Error communicating with FTP Remote Resource " +getAddr());
+            Main.log.info("Error communicating with FTP Remote Resource " +getAddr());
             jsonResult=AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,"Error communicating with FTP Resource");
             ftpclient.disconnect();
         } 
@@ -150,8 +150,8 @@ public class RemoteResourceFtp {
             return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,ftpclient.getReplyString());
             }
         } catch(IOException ioe) {
-            Agent.log.info(ioe.getLocalizedMessage());
-            Agent.log.info("Error communicating with FTP Remote Resource " +getAddr());
+            Main.log.info(ioe.getLocalizedMessage());
+            Main.log.info("Error communicating with FTP Remote Resource " +getAddr());
             return AgentSystem.createMsgStatus(AgentSystem.STATUS_ERROR,"Error communicating with FTP Resource");
         } 
         FTPFile[] ftpfiles = ftpclient.listFiles(path); 
@@ -171,7 +171,7 @@ public class RemoteResourceFtp {
                 List.add(json);             
                 }
         jsonResult.put("list", List);
-        Agent.log.info("JSONresult = "+jsonResult.toString());
+        Main.log.info("JSONresult = "+jsonResult.toString());
         return jsonResult;
     }
     

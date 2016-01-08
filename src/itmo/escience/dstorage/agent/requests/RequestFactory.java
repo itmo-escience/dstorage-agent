@@ -1,6 +1,6 @@
 package itmo.escience.dstorage.agent.requests;
 
-import itmo.escience.dstorage.agent.Agent;
+import itmo.escience.dstorage.agent.Main;
 import itmo.escience.dstorage.agent.utils.AgentAccessURI;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -20,20 +20,20 @@ public class RequestFactory {
         /*
         for(AgentAccessURI u:AgentAccessURI.values()){
             try {
-                if(URLDecoder.decode(request.getRequestLine().getUri(),Agent.getLocalEncoding()).equals(u.getString()))
-                    uri=AgentAccessURI.valueOf(URLDecoder.decode(request.getRequestLine().getUri(),Agent.getLocalEncoding()));
+                if(URLDecoder.decode(request.getRequestLine().getUri(),Main.getLocalEncoding()).equals(u.getString()))
+                    uri=AgentAccessURI.valueOf(URLDecoder.decode(request.getRequestLine().getUri(),Main.getLocalEncoding()));
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(RequestFactory.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         */
         try{
-            uri=AgentAccessURI.parseUri(URLDecoder.decode(request.getRequestLine().getUri(),Agent.getLocalEncoding()));
+            uri=AgentAccessURI.parseUri(URLDecoder.decode(request.getRequestLine().getUri(),Main.getLocalEncoding()));
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(RequestFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
         //try {
-        //    uri=AgentAccessURI.valueOf(URLDecoder.decode(request.getRequestLine().getUri(),Agent.getLocalEncoding()));
+        //    uri=AgentAccessURI.valueOf(URLDecoder.decode(request.getRequestLine().getUri(),Main.getLocalEncoding()));
         //} catch (UnsupportedEncodingException ex) {
         //    Logger.getLogger(RequestFactory.class.getName()).log(Level.SEVERE, null, ex);
         //}

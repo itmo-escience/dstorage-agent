@@ -61,6 +61,7 @@ public class StorageLayer {
             case HDD:return isHddStorage(id);
             case MEM:return isMemStorage(id);
             case SSD:return isSsdStorage(id);
+            case NOTSET:return (isSsdStorage(id)||isMemStorage(id)||isHddStorage(id));
             default: return false;
         }
     }

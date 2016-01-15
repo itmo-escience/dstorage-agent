@@ -16,6 +16,7 @@ import itmo.escience.dstorage.agent.utils.AgentCommandParam;
 import itmo.escience.dstorage.agent.utils.AgentMessage;
 import itmo.escience.dstorage.agent.utils.AgentMessageCreater;
 import itmo.escience.dstorage.agent.utils.AgentSystemStatus;
+import itmo.escience.dstorage.agent.utils.HttpConn;
 import itmo.escience.dstorage.agent.utils.StorageLevel;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,6 +79,11 @@ public class LvlMgmtHandler implements Runnable {
         //else{        
             switch(request.getAgentCommand()){
                 case COPY:
+                    if(!request.getParam(AgentCommandParam.URI.name()).equals(Main.getAgentAddress()+":"+Main.getAgentPort()))//it is remote agent
+                    {
+                        status=downloadFile();
+                    }
+                    else //local file
                     status=lvlCopy(filename,StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLFROM.name()))),
                             StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLTO.name()))));
                     break;
@@ -105,5 +111,33 @@ public class LvlMgmtHandler implements Runnable {
         } catch (Exception ex) {
             Logger.getLogger(LvlMgmtHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
+    }
+    private long downloadFile(){
+        long status=0L;
+        try {
+            String uri=request.getParam(AgentCommandParam.URI.name());
+            String fileid=request.getParam(AgentCommandParam.ID.name());
+            StorageLevel levelfrom=StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLFROM.name())));
+            StorageLevel levelto=StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLTO.name())));
+            String ip=uri.split(":")[0];
+            String port=uri.split(":")[1];
+            HttpConn httpconn = new HttpConn();
+            httpconn.setup(ip,port);
+            httpconn.setMethod("GET",fileid);
+            if ((Main.getConfig().isProperty("Security"))){
+                if (Main.getConfig().getProperty("Security").equals("2")){                    
+                    httpconn.setHeader("Ticket", request.getHeader("Ticket"));
+                    httpconn.setHeader("Sign", request.getHeader("Sign")); 
+                    httpconn.setHeader("StorageLevel",String.valueOf(levelfrom.getNum()));
+                }
+            }
+            httpconn.connect();
+            InputStream is = httpconn.getInputStreamResponse();
+            status=Main.getStorageLayer().addFile(levelto, is, fileid);             
+            httpconn.close();
+        } catch (Exception ex) {
+            Logger.getLogger(AgentGetFileHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;
+    }
 }

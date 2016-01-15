@@ -67,6 +67,11 @@ lvl2 - 0,1,2 (to)
 
     @Override
     public AgentResponse process() {
+        if(!validateRequest(this)){
+                    Main.log.info(response.getMessage());
+                    return response;
+        }
+        
         switch(getAgentCommand()){
             case MOVE:
                 //copy file
@@ -105,7 +110,7 @@ lvl2 - 0,1,2 (to)
                 Thread threadLvl=new Thread(lvlHandler);
                 threadLvl.start();
                 break;
-            case COPYREMOTE:
+            case COPYREMOTE://obsolete
                 if(!isValidRequestParam()){
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
@@ -117,7 +122,6 @@ lvl2 - 0,1,2 (to)
                 Thread threadGetFile=new Thread(getFileHandler);
                 threadGetFile.start();
                 break;
-                //getFileHandler.start();                //getFileHandler.start();
         }        
         return response;
     }

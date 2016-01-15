@@ -87,7 +87,6 @@ public class StorageLayer {
                 agentProp.add(filename);
                 break;
         }
-        
         return size;
     }
     public long getFreeMemToUse(){
@@ -140,7 +139,9 @@ public class StorageLayer {
             case SSD:
                 if(isSsdStorage(filename)) {
                     File file=new File(fileToSsdPath(filename));
-                    return file.delete();
+                    boolean deleted=file.delete();
+                    Main.log.info("File deleting status: "+file.getPath()+" "+deleted);
+                    return deleted;
                 }else return false;
         }
         return false;
@@ -178,7 +179,7 @@ public class StorageLayer {
                 ByteBuffer bb=this.mappedFiles.get(filename);
                 return bb.array().length;              
             case SSD: 
-                return new File(fileToHddPath(filename)).length();
+                return new File(fileToSsdPath(filename)).length();
             case HDD: 
                 return new File(fileToHddPath(filename)).length();
             default: 
@@ -305,7 +306,7 @@ public class StorageLayer {
                 outStream.write(bytes,0,intBytesRead);
             outStream.flush();
             outStream.close();
-            //is.close();
+            is.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StorageLayer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

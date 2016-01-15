@@ -46,7 +46,9 @@ public class UploadFileHandler implements IRequestHandler{
         this.request=(UploadFileRequest)request;
         if(!validateRequest())return response;        
         StorageLayer layer=Main.getStorageLayer();
-        String filename = this.request.getTarget();        
+        String filename = this.request.getTarget();
+        //delete slash
+        if(filename.startsWith("/"))filename=filename.substring(1);
         if (layer.isFileExist(filename)) {
             response.setStatus(HttpStatus.SC_FORBIDDEN);
             response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("File "+filename +" already exist", 

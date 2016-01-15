@@ -41,8 +41,7 @@ lvl2 - 0,1,2 (to)
     public CommandRequest(HttpRequest httpRequest){
         super(httpRequest);
         parseRequestLine(httpRequest.getRequestLine().getUri());
-        response=new SimpleResponse();
-        
+        response=new SimpleResponse();        
     }
     private void parseRequestLine(String line){
         Main.log.info("Request line parse = " +line);
@@ -52,7 +51,12 @@ lvl2 - 0,1,2 (to)
             param.put(p[0].toUpperCase(),p[1]);
         }
         Main.log.info("Parse result: " +param.toString());
-        if(param.containsKey(AgentRequestType.CMD.name()))commandType=AgentCommand.valueOf(param.get(AgentRequestType.CMD.name()).toUpperCase());        
+        if(param.containsKey(AgentRequestType.CMD.name()))commandType=AgentCommand.valueOf(param.get(AgentRequestType.CMD.name()).toUpperCase()); 
+        //double check for copy command to divide to remote case
+        if(commandType.equals(AgentCommand.COPY)){
+            if(param.containsKey(AgentCommandParam.URI))
+                commandType=AgentCommand.COPYREMOTE;
+        }
     }
     public boolean isParam(String key){return param.containsKey(key);}
     public String getParam(String key){return param.get(key);}
@@ -64,8 +68,20 @@ lvl2 - 0,1,2 (to)
     @Override
     public AgentResponse process() {
         switch(getAgentCommand()){
-            case LVLMOVE:
-            case LVLDELETE:
+            case MOVE:
+                //copy file
+                if(!isValidRequestParam()){
+                    response.setStatus(HttpStatus.SC_BAD_REQUEST);
+                    response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
+                    AgentSystemStatus.FAILED));     
+                    Main.log.info(response.getMessage());
+                    return response;
+                }
+                LvlMgmtHandler lvlHandlerMove=new LvlMgmtHandler(this);
+                Thread threadLvlMove=new Thread(lvlHandlerMove);
+                threadLvlMove.start();
+                break;
+            case DELETE:
                 if(!isValidRequestParam()){
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
@@ -77,7 +93,7 @@ lvl2 - 0,1,2 (to)
                 Thread threadLvlDel=new Thread(lvlHandlerDel);
                 threadLvlDel.start();
                 break;
-            case LVLCOPY:
+            case COPY:
                 if(!isValidRequestParam()){
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
@@ -89,7 +105,7 @@ lvl2 - 0,1,2 (to)
                 Thread threadLvl=new Thread(lvlHandler);
                 threadLvl.start();
                 break;
-            case GET:
+            case COPYREMOTE:
                 if(!isValidRequestParam()){
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     response.setJsonMsg(AgentMessageCreater.createJsonActionResponse("Not enough param in request"+" "+getTarget(), 
@@ -107,23 +123,24 @@ lvl2 - 0,1,2 (to)
     }
     private boolean isValidRequestParam(){
         switch(getAgentCommand()){
-            case LVLCOPY:
-            case LVLMOVE:
+            case COPY:                
+            case MOVE:
                 if(!isParam(AgentCommandParam.ID.name()))return false;
                 if(!isParam(AgentCommandParam.LVLFROM.name()))return false;
                 if(!isParam(AgentCommandParam.LVLTO.name()))return false;
                 //if(!isParam(AgentCommandParam.CMD.name()))return false;
                 return true;
-            case LVLDELETE:
+            case DELETE:
                 if(!isParam(AgentCommandParam.ID.name()))return false;
                 if(!isParam(AgentCommandParam.LVL.name()))return false;
                 return true;
-            case GET:
+            
+            case COPYREMOTE:
                 if(!isParam(AgentCommandParam.ID.name()))return false;
                 if(!isParam(AgentCommandParam.URI.name()))return false;
                 if(!isParam(AgentCommandParam.LVLFROM.name()))return false;
                 if(!isParam(AgentCommandParam.LVLTO.name()))return false;
-                return true;
+                return true;                
         }
                 return false;
     }

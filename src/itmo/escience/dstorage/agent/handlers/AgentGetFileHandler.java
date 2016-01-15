@@ -7,6 +7,7 @@ import itmo.escience.dstorage.agent.StorageLayer;
 import itmo.escience.dstorage.agent.Ticket;
 import itmo.escience.dstorage.agent.requests.CommandRequest;
 import itmo.escience.dstorage.agent.responses.CoreAckResponse;
+import itmo.escience.dstorage.agent.utils.AgentCommand;
 import itmo.escience.dstorage.agent.utils.AgentCommandParam;
 import itmo.escience.dstorage.agent.utils.AgentMessageCreater;
 import itmo.escience.dstorage.agent.utils.AgentSystemStatus;
@@ -77,7 +78,7 @@ public class AgentGetFileHandler implements Runnable{
                 coreResponse.setSize(Main.getStorageLayer().addFile(levelto, is, fileid));    
             else
                 coreResponse.setSize(0L);
-            coreResponse.setCmd(request.getAgentCommand());
+            coreResponse.setCmd(AgentCommand.COPY);
             httpconn.close();
         } catch (Exception ex) {
             Logger.getLogger(AgentGetFileHandler.class.getName()).log(Level.SEVERE, null, ex);

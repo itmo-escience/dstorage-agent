@@ -56,6 +56,7 @@ public class LvlMgmtHandler implements Runnable {
         //copy
         long size=0;
         size=layer.addFile(to, is, filename);
+        
         //delete
         if(size>0) {
             if(!layer.deleteFileFromLevel(from,filename)) return 0;
@@ -76,15 +77,15 @@ public class LvlMgmtHandler implements Runnable {
         }*/ 
         //else{        
             switch(request.getAgentCommand()){
-                case LVLCOPY:
+                case COPY:
                     status=lvlCopy(filename,StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLFROM.name()))),
                             StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLTO.name()))));
                     break;
-                case LVLMOVE:
+                case MOVE:
                     status=lvlMove(filename,StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLFROM.name()))),
                             StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLTO.name()))));
                     break;
-                case LVLDELETE:
+                case DELETE:
                     status=lvlDelete(filename,StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVL.name()))));
                     break;
             }
@@ -92,7 +93,7 @@ public class LvlMgmtHandler implements Runnable {
         //TODO Sender class
         coreResponse.setFileId(filename);
         coreResponse.setSize(status);
-        if(request.getAgentCommand().equals(AgentCommand.LVLDELETE))
+        if(request.getAgentCommand().equals(AgentCommand.DELETE))
             coreResponse.setLvl(StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVL.name()))));
         else 
             coreResponse.setLvl(StorageLevel.getLevelById(Integer.parseInt(request.getParam(AgentCommandParam.LVLTO.name()))));

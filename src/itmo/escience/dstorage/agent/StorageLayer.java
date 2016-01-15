@@ -266,10 +266,9 @@ public class StorageLayer {
         try {
             InputStream is=new FileInputStream(new File(filename));
             byte[] buf =new byte[4096];
-            int intBytesRead=0;
-            byte[] bytes = new byte[4096];
+            int intBytesRead=0;            
             while ((intBytesRead=is.read(buf))!=-1)
-                baos.write(bytes,0,intBytesRead);
+                baos.write(buf,0,intBytesRead);
             baos.flush();
             is.close();
             } catch (FileNotFoundException ex) {

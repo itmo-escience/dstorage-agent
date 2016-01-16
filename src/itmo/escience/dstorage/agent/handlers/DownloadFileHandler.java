@@ -70,7 +70,6 @@ public class DownloadFileHandler implements IRequestHandler {
             response.setContentType(ContentType.TEXT_HTML);
         }
         else{
-            //ByteArrayEntity bae=layer.getFile(this.request.getStorageLevel(),filename, this.request.getContentType());
             if(!layer.isFileOnLevel(this.request.getStorageLevel(), filename)){
                 response.setStatus(HttpStatus.SC_NOT_FOUND);
                 response.setEntity(new ByteArrayEntity((AgentMessageCreater.createJsonError(AgentMessage.NOTFOUND.getString(), AgentSystemStatus.FAILED)).getBytes(),

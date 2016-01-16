@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpRequest;
+import org.apache.http.protocol.HttpContext;
 
 /**
  *

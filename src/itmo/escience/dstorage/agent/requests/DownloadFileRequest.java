@@ -5,6 +5,7 @@ import itmo.escience.dstorage.agent.responses.AgentResponse;
 import itmo.escience.dstorage.agent.utils.AgentHttpHeaders;
 import itmo.escience.dstorage.agent.utils.StorageLevel;
 import org.apache.http.HttpRequest;
+import org.apache.http.protocol.HttpContext;
 
 /**
  *
@@ -14,9 +15,11 @@ public class DownloadFileRequest extends AgentRequest {
     
     private final static AgentRequestType type=AgentRequestType.DOWNLOADFILE; 
     private final StorageLevel storageLevel;
+    private HttpContext context;
     
     public DownloadFileRequest(HttpRequest httpRequest){
         super(httpRequest);
+        this.context=context;
         int istorage;
         if(!checkHeaders(new String[]{AgentHttpHeaders.StorageLevel.getHeaderString()})) istorage=-1;//storageType header not in request. Use NOTSET value
         else {
@@ -29,6 +32,8 @@ public class DownloadFileRequest extends AgentRequest {
             default: storageLevel=StorageLevel.NOTSET;break;
         }
     }
+    public HttpContext getContext(){return context;}
+    
     @Override
     public AgentRequestType getType() {return type;}
 

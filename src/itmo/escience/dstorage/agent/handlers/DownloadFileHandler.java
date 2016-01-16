@@ -11,9 +11,12 @@ import itmo.escience.dstorage.agent.responses.SimpleResponse;
 import itmo.escience.dstorage.agent.utils.AgentMessage;
 import itmo.escience.dstorage.agent.utils.AgentMessageCreater;
 import itmo.escience.dstorage.agent.utils.AgentSystemStatus;
+import itmo.escience.dstorage.agent.utils.StorageLevel;
+import org.apache.http.HttpConnection;
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
+import org.apache.http.protocol.HttpCoreContext;
 
 /**
  *
@@ -73,8 +76,14 @@ public class DownloadFileHandler implements IRequestHandler {
                 response.setEntity(new ByteArrayEntity((AgentMessageCreater.createJsonError(AgentMessage.NOTFOUND.getString(), AgentSystemStatus.FAILED)).getBytes(),
                         ContentType.APPLICATION_JSON));
             }
-            else 
-                response.setEntity(layer.getFile(this.request.getStorageLevel(),filename, this.request.getContentType()));
+            else {
+                //HttpCoreContext coreContext = HttpCoreContext.adapt(request.getContext());
+                //HttpConnection conn = coreContext.getConnection(HttpConnection.class);
+                if(layer.isFileOnLevel(StorageLevel.MEM, filename))
+                    response.setEntity(layer.getFile(this.request.getStorageLevel(),filename, this.request.getContentType()));
+                else
+                    response.setEntity(layer.getFileN(this.request.getStorageLevel(),filename, this.request.getContentType()));
+                }
             response.setContentType(this.request.getContentType());
         }
         

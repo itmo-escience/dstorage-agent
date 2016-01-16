@@ -96,7 +96,7 @@ public class Main {
     }
     
     private static InetAddress AgentInetAddress;
-    final static  String agentVersion = "1.0.4";
+    final static  String agentVersion = "1.0.6";
 
 
     final static String defaultRegion ="SPB";

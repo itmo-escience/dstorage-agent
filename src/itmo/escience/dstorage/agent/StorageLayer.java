@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
+import org.apache.http.nio.entity.NByteArrayEntity;
+import org.apache.http.nio.entity.NFileEntity;
 
 /**
  *
@@ -170,6 +172,14 @@ public class StorageLayer {
             }
         }
     }
+    public NFileEntity getFileN(StorageLevel type,String filename,ContentType contentType) {
+        switch(type){
+            //case MEM: return getFileFromMEMN(filename,contentType);                
+            case SSD: return getFileFromDiskAsNFE(fileToSsdPath(filename),contentType);
+            case HDD: return getFileFromDiskAsNFE(fileToHddPath(filename),contentType);
+            default: return getFileFromDiskAsNFE(fileToHddPath(filename),contentType);            
+        }
+    }
     public long getFileLen(StorageLevel type,String filename){
         switch(type){
             case MEM: 
@@ -201,6 +211,10 @@ public class StorageLayer {
         return new ByteArrayEntity((AgentMessageCreater.createJsonError(AgentMessage.NOTFOUND.getString(), AgentSystemStatus.FAILED)).getBytes(),
                         ContentType.APPLICATION_JSON);
     }
+    public static NByteArrayEntity getNEntityWithErrorMsg(){
+        return new NByteArrayEntity((AgentMessageCreater.createJsonError(AgentMessage.NOTFOUND.getString(), AgentSystemStatus.FAILED)).getBytes(),
+                        ContentType.APPLICATION_JSON);
+    }
     private ByteArrayEntity getFileFromMEM(String filename,ContentType contentType){ 
         if(!mappedFiles.containsKey(filename)){
             return getEntityWithErrorMsg();
@@ -221,6 +235,29 @@ public class StorageLayer {
                 mapped.get(bytes);
             }
             ByteArrayEntity ent=new ByteArrayEntity(bytes,contentType);
+            return ent;      
+        }
+    }
+    private NByteArrayEntity getFileFromMEMN(String filename,ContentType contentType){ 
+        if(!mappedFiles.containsKey(filename)){
+            return getNEntityWithErrorMsg();
+        }
+        else{
+            //MappedByteBuffer mapped=readMappedFile(filename);
+            ByteBuffer mapped=readFileInMem(filename);
+            mapped.position(0);
+            byte[] bytes=null;
+            //if(mapped.isLoaded()){Main.log.info("Mapped loaded");}
+            if(mapped.hasArray()){
+                Main.log.info("Mapped direct");
+                bytes=mapped.array();
+            }
+            else{
+                Main.log.info("Mapped indirect:"+mapped.capacity());
+                bytes=new byte[mapped.capacity()];
+                mapped.get(bytes);
+            }
+            NByteArrayEntity ent=new NByteArrayEntity(bytes,contentType);
             return ent;      
         }
     }
@@ -280,6 +317,28 @@ public class StorageLayer {
             }
         return new ByteArrayEntity(baos.toByteArray(),contentType);
     }
+    private static NByteArrayEntity getFileFromDiskAsNBAE(String filename,ContentType contentType){
+        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+        try {
+            InputStream is=new FileInputStream(new File(filename));
+            byte[] buf =new byte[4096];
+            int intBytesRead=0;            
+            while ((intBytesRead=is.read(buf))!=-1)
+                baos.write(buf,0,intBytesRead);
+            baos.flush();
+            is.close();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(StorageLayer.class.getName()).log(Level.SEVERE, null, ex);
+                return getNEntityWithErrorMsg();
+            } catch (IOException ex) {
+                Logger.getLogger(StorageLayer.class.getName()).log(Level.SEVERE, null, ex);
+                return getNEntityWithErrorMsg();                
+            }
+        return new NByteArrayEntity(baos.toByteArray(),contentType);
+    }
+    private static NFileEntity getFileFromDiskAsNFE(String filename,ContentType contentType){
+        return new NFileEntity(new File(filename),contentType);
+    }
     private static InputStream getFileFromDiskAsStream(String filename){
         InputStream is=null;
         try {
@@ -301,9 +360,9 @@ public class StorageLayer {
             outStream = new FileOutputStream(path);        
             int intBytesRead=0;
             byte[] bytes = new byte[4096];
-            while ((intBytesRead=is.read(bytes))!=-1)
+            while ((intBytesRead=is.read(bytes))!=-1){
                 outStream.write(bytes,0,intBytesRead);
-            outStream.flush();
+            outStream.flush();}
             outStream.close();
             is.close();
         } catch (FileNotFoundException ex) {
